@@ -1,5 +1,21 @@
 {% extends 'layout.html' %}
 {% block content %}
     <h1>Raamatukogu</h1>
-    <a href="/login">Logi sisse</a>
+    {% if user %}
+        <p><a href="/logout">Logi välja</a></p>
+    {% else %}
+        <p><a href="/login">Logi sisse</a></p>
+    {% endif %}
+    <p><a href="/status">Raamatukogu üldine seis</a></p>
+    {% if user %}
+        <br>
+        <p>Raamatu otsing</p>
+        {%  if user == 'admin' %}
+            <p>Lisa uus raamat</p>
+        {% endif %}
+        <p>Laenutaja otsing</p>
+        <p>Lisa uus laenutaja</p>
+        <br>
+        <p>Üle aja läinud laenutajad</p>
+    {% endif %}
 {% endblock %}

@@ -1,13 +1,14 @@
 from flask import Flask, redirect, url_for, render_template, request, session, flash
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.secret_key = 'mauki'
+app.secret_key = 'd46de97837b274867df6ac9d2861bb9b'
 
 
 @app.route('/')
 def home():
     if 'user' in session:
-        return render_template('user.html')
+        return render_template('home.html', user=session['user'])
     else:
         return render_template('home.html')
 
@@ -22,7 +23,7 @@ def login():
     else:
         if 'user' in session:
             flash('Juba sisse logitud!')
-            return redirect(url_for('user'))
+            return redirect(url_for('home'))
         return render_template('login.html')
 
 
@@ -34,11 +35,15 @@ def logout():
     return redirect(url_for('home'))
 
 
-@app.route('/user')
-def user():
+@app.route('/status')
+def status():
+    return render_template('status.html')
+
+
+@app.route('/add_book')
+def add_book():
     if 'user' in session:
-        user = session['user']
-        return redirect('home')
+        return '<h1>Raamatu lisamine</h1>'
     else:
         flash('Ei ole sisse logitud')
         return redirect(url_for('login'))
