@@ -35,7 +35,8 @@ def logout():
 
 @app.route('/status')
 def status():
-    return render_template('status.html')
+    books = Book.query.all()
+    return render_template('status.html', books=books)
 
 
 @app.route('/add_book', methods=['GET', 'POST'])
