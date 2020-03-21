@@ -26,7 +26,7 @@ def login():
                 if next_page:
                     return redirect(next_page)
                 else:
-                    redirect(url_for('home'))
+                    return redirect(url_for('home'))
             else:
                 flash('Kasutajat ei ole olemas! Proovi uuesti.')
     return render_template('login.html', form=form)
