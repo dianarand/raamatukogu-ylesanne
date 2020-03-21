@@ -15,7 +15,12 @@ class BookForm(FlaskForm):
     submit = SubmitField('Lisa')
 
 
-class AddLenderForm(FlaskForm):
+class LenderForm(FlaskForm):
     name = StringField('Eesnimi', validators=[DataRequired(), Length(max=50)])
     surname = StringField('Perekonnanimi', validators=[DataRequired(), Length(max=50)])
+    code = StringField('Isikukood', validators=[DataRequired(), Length(min=11, max=11)])
     submit = SubmitField('Lisa')
+
+class BookLendForm(FlaskForm):
+    code = StringField('Isikukood', validators=[DataRequired(), Length(min=11, max=11)])
+    submit = SubmitField('Laenuta')

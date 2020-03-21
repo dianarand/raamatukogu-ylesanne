@@ -1,6 +1,6 @@
 from flask import redirect, url_for, render_template, request, flash
 from libraryapp import app, db
-from libraryapp.forms import LoginForm, BookForm, AddLenderForm
+from libraryapp.forms import LoginForm, BookForm, LenderForm, BookLendForm
 from libraryapp.models import Book, Lender, User
 from flask_login import login_user, current_user, logout_user, login_required
 
@@ -67,23 +67,42 @@ def add_book():
         return redirect(url_for('home'))
 
 
-@app.route('/book/<book_id>')
+@app.route('/book/<int:book_id>')
 @login_required
 def book(book_id):
     book = Book.query.get_or_404(book_id)
     return render_template('book.html', book=book)
 
 
+@app.route('/book/<int:book_id>/lend', methods=['GET', 'POST'])
+@login_required
+def lend_book(book_id):
+    book = Book.query.get_or_404(book_id)
+    form = BookLendForm()
+    if form.validate_on_submit():
+        lender = User.query.filter_by(personal_code=form.code.data)
+        if lender:
+            book.lender_id = lender.id
+            db.session.commit()
+            flash(f'Raamat on laenutatud kasutajale {lender}')
+            return redirect(url_for('home'))
+        else:
+            flash('Laenutajat ei ole olemas! Proovi uuesti.')
+    return render_template('lender.html', title='Raamatu laenutamine', book=book, form=form)
+
+
 @app.route('/add_lender', methods=['GET', 'POST'])
 @login_required
 def add_lender():
-    form = AddLenderForm()
+    form = LenderForm()
     if form.validate_on_submit():
-        name = form.name.data
-        surname = form.surname.data
-        lender = Lender(name=name, surname=surname)
+        lender = Lender(
+            name=form.name.data,
+            surname=form.surname.data,
+            personal_code=form.code.data
+        )
         db.session.add(lender)
         db.session.commit()
         flash('Laenutaja lisatud!')
         return redirect(url_for('home'))
-    return render_template('add_lender.html', form=form)
+    return render_template('lender.html', title='Lisa uus laenutaja', form=form)
