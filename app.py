@@ -1,5 +1,4 @@
 from flask import Flask, redirect, url_for, render_template, request, session, flash
-from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.secret_key = 'd46de97837b274867df6ac9d2861bb9b'
@@ -50,4 +49,4 @@ def add_book():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
