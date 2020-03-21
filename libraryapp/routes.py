@@ -52,10 +52,11 @@ def add_book():
     if current_user.admin:
         form = BookForm()
         if form.validate_on_submit():
-            title = form.title.data
-            author = form.author.data
-            location = form.location.data
-            book = Book(title=title, author=author, location=location)
+            book = Book(
+                title=form.title.data,
+                author=form.author.data,
+                location=form.location.data
+            )
             db.session.add(book)
             db.session.commit()
             flash('Raamat lisatud!')
