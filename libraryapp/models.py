@@ -1,5 +1,7 @@
 from datetime import date, timedelta
-from libraryapp import db
+from libraryapp import db, login_manager
+from flask_login import UserMixin
+
 
 class Book(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -7,9 +9,10 @@ class Book(db.Model):
     author = db.Column(db.String(100), nullable=False)
     date_added = db.Column(db.Date, default=date.today, nullable=False)
     location = db.Column(db.Integer, nullable=False)
-    #time_limit = db.Column(db.Integer, default=4, nullable=False)
+    # time_limit = db.Column(db.Integer, default=4, nullable=False)
     lender_id = db.Column(db.Integer, db.ForeignKey('lender.id'))
-    #deadline = db.Column(db.Date, default=(date.today() + timedelta(weeks=self.time_limit)))
+
+    # deadline = db.Column(db.Date, default=(date.today() + timedelta(weeks=self.time_limit)))
 
     def __repr__(self):
         return f'{self.title} ({self.author})'
@@ -23,3 +26,14 @@ class Lender(db.Model):
 
     def __repr__(self):
         return f'{self.surname}, {self.name}'
+
+
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(20), nullable=False)
+    admin = db.Column(db.Boolean, nullable=False)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))

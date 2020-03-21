@@ -2,8 +2,15 @@
 {% block content %}
     <h1>Logi sisse</h1>
     <form method="post" action="#">
-        <p>Kasutaja:</p>
-        <p><input type="text" name="username" /></p>
-        <p><input type="submit" value="Sisene" /></p>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.username.label() }}:
+        </p>
+        <p>
+            {{ form.username() }}
+        </p>
+        <p>
+            {{ form.submit() }}
+        </p>
     </form>
 {% endblock %}
