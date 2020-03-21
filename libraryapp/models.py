@@ -33,9 +33,6 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(20), nullable=False)
     admin = db.Column(db.Boolean, nullable=False)
 
-    def __repr__(self):
-        return f'{self.username}'
-
 
 @login_manager.user_loader
 def load_user(user_id):

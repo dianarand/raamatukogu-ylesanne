@@ -1,4 +1,4 @@
-from flask import redirect, url_for, render_template, request, session, flash
+from flask import redirect, url_for, render_template, request, flash
 from libraryapp import app, db
 from libraryapp.forms import LoginForm, AddBookForm, AddLenderForm
 from libraryapp.models import Book, Lender, User
