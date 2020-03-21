@@ -4,6 +4,9 @@
     {% if book %}
         <p>Raamat: {{ book }}</p>
     {% endif %}
+    {% if lender %}
+        <p>Raamatut tagastab laenutaja {{ lender }}</p>
+    {% endif %}
     <form method="post" action="#">
         {{ form.hidden_tag() }}
         {% if form.name %}
@@ -14,8 +17,10 @@
             <p>{{ form.surname.label() }}:</p>
             <p>{{ form.surname() }}</p>
         {% endif %}
-        <p>{{ form.code.label() }}:</p>
-        <p>{{ form.code() }}</p>
+        {% if form.code %}
+            <p>{{ form.code.label() }}:</p>
+            <p>{{ form.code() }}</p>
+        {% endif %}
         <p>{{ form.submit() }}</p>
     </form>
 {% endblock %}

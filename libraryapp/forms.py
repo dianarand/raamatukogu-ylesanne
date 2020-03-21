@@ -24,3 +24,6 @@ class LenderForm(FlaskForm):
 class BookLendForm(FlaskForm):
     code = StringField('Isikukood', validators=[DataRequired(), Length(min=11, max=11)])
     submit = SubmitField('Laenuta')
+
+class ConfirmButton(FlaskForm):
+    submit = SubmitField('Kinnita')

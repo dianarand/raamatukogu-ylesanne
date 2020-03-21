@@ -1,6 +1,6 @@
 from flask import redirect, url_for, render_template, request, flash, abort
 from libraryapp import app, db
-from libraryapp.forms import LoginForm, BookForm, LenderForm, BookLendForm
+from libraryapp.forms import LoginForm, BookForm, LenderForm, BookLendForm, ConfirmButton
 from libraryapp.models import Book, Lender, User
 from flask_login import login_user, current_user, logout_user, login_required
 
@@ -79,7 +79,7 @@ def lend_book(book_id):
     book = Book.query.get_or_404(book_id)
     form = BookLendForm()
     if form.validate_on_submit():
-        lender = User.query.filter_by(personal_code=form.code.data)
+        lender = Lender.query.filter_by(personal_code=form.code.data).first()
         if lender:
             book.lender_id = lender.id
             db.session.commit()
@@ -93,7 +93,15 @@ def lend_book(book_id):
 @app.route('/book/<int:book_id>/return', methods=['GET', 'POST'])
 @login_required
 def return_book(book_id):
-    return render_template('home.html')
+    book = Book.query.get_or_404(book_id)
+    lender = Lender.query.get(book.lender_id)
+    form = ConfirmButton()
+    if form.validate_on_submit():
+        book.lender_id = None
+        db.session.commit()
+        flash(f'Raamat "{book.title}" on tagastatud kasutajalt {lender}')
+        return redirect(url_for('home'))
+    return render_template('lender.html', title='Raamatu tagastamine', book=book, lender=lender, form=form)
 
 
 @app.route('/book/<int:book_id>/delete', methods=['GET', 'POST'])

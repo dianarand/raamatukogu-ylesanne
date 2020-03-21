@@ -11,7 +11,6 @@ class Book(db.Model):
     location = db.Column(db.Integer, nullable=False)
     # time_limit = db.Column(db.Integer, default=4, nullable=False)
     lender_id = db.Column(db.Integer, db.ForeignKey('lender.id'))
-
     # deadline = db.Column(db.Date, default=(date.today() + timedelta(weeks=self.time_limit)))
 
     def __repr__(self):
@@ -26,7 +25,7 @@ class Lender(db.Model):
     lended_books = db.relationship('Book', backref='lender')
 
     def __repr__(self):
-        return f'{self.surname}, {self.name}'
+        return f'{self.name} {self.surname}'
 
 
 class User(db.Model, UserMixin):
