@@ -1,0 +1,23 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <h1>{{ book.title }}</h1>
+    <p>Autor: {{ book.author }}</p>
+    <p>Asukoht: Riiul {{ book.location }}</p>
+    <p>
+        Seis:
+        {% if book.lender_id %}
+            Välja laenutatud kasutajale {{ book.lender }}
+        {% else %}
+            Saadaval
+        {% endif %}
+    </p>
+    <br>
+    {% if current_user.admin %}
+        <p>Kustuta raamat</p>
+    {% else %}
+        <p>Laenuta raamat välja</p>
+        <p>Võta raamat vastu</p>
+    {% endif %}
+    <br>
+    <p><a href="/">Tagasi esilehele</a></p>
+{% endblock %}

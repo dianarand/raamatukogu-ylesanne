@@ -67,6 +67,13 @@ def add_book():
         return redirect(url_for('home'))
 
 
+@app.route('/book/<book_id>')
+@login_required
+def book(book_id):
+    book = Book.query.get_or_404(book_id)
+    return render_template('book.html', book=book)
+
+
 @app.route('/add_lender', methods=['GET', 'POST'])
 @login_required
 def add_lender():
