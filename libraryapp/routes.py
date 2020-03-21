@@ -1,6 +1,6 @@
 from flask import redirect, url_for, render_template, request, flash
 from libraryapp import app, db
-from libraryapp.forms import LoginForm, AddBookForm, AddLenderForm
+from libraryapp.forms import LoginForm, BookForm, AddLenderForm
 from libraryapp.models import Book, Lender, User
 from flask_login import login_user, current_user, logout_user, login_required
 
@@ -46,11 +46,11 @@ def status():
     return render_template('status.html', books=books)
 
 
-@app.route('/add_book', methods=['GET', 'POST'])
+@app.route('/book/new', methods=['GET', 'POST'])
 @login_required
 def add_book():
     if current_user.admin:
-        form = AddBookForm()
+        form = BookForm()
         if form.validate_on_submit():
             title = form.title.data
             author = form.author.data
