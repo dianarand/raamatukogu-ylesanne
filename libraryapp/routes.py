@@ -1,4 +1,4 @@
-from flask import redirect, url_for, render_template, request, flash
+from flask import redirect, url_for, render_template, request, flash, abort
 from libraryapp import app, db
 from libraryapp.forms import LoginForm, BookForm, LenderForm, BookLendForm
 from libraryapp.models import Book, Lender, User
@@ -49,7 +49,9 @@ def status():
 @app.route('/book/new', methods=['GET', 'POST'])
 @login_required
 def add_book():
-    if current_user.admin:
+    if not current_user.admin:
+        abort(403)
+    else:
         form = BookForm()
         if form.validate_on_submit():
             book = Book(
@@ -62,9 +64,6 @@ def add_book():
             flash('Raamat lisatud!')
             return redirect(url_for('home'))
         return render_template('add_book.html', form=form)
-    else:
-        flash('Puuduvad õigused')
-        return redirect(url_for('home'))
 
 
 @app.route('/book/<int:book_id>')
@@ -100,6 +99,8 @@ def return_book(book_id):
 @app.route('/book/<int:book_id>/delete', methods=['GET', 'POST'])
 @login_required
 def delete_book(book_id):
+    if not current_user.admin:
+        abort(403)
     return render_template('home.html')
 
 
