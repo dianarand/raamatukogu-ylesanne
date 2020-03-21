@@ -91,6 +91,18 @@ def lend_book(book_id):
     return render_template('lender.html', title='Raamatu laenutamine', book=book, form=form)
 
 
+@app.route('/book/<int:book_id>/return', methods=['GET', 'POST'])
+@login_required
+def return_book(book_id):
+    return render_template('home.html')
+
+
+@app.route('/book/<int:book_id>/delete', methods=['GET', 'POST'])
+@login_required
+def delete_book(book_id):
+    return render_template('home.html')
+
+
 @app.route('/add_lender', methods=['GET', 'POST'])
 @login_required
 def add_lender():
