@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, Length
+from wtforms import StringField, PasswordField, SubmitField, IntegerField
+from wtforms.validators import DataRequired, Length, NumberRange
 
 
 class LoginForm(FlaskForm):
@@ -9,13 +9,14 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Sisene')
 
 
-class AddBook(FlaskForm):
-    title = StringField('title', validators=[DataRequired(), Length(max=100)])
-    author = StringField('author', validators=[DataRequired(), Length(max=100)])
-    submit = SubmitField('submit')
+class AddBookForm(FlaskForm):
+    title = StringField('Pealkiri', validators=[DataRequired(), Length(max=100)])
+    author = StringField('Autor', validators=[DataRequired(), Length(max=100)])
+    location = IntegerField('Riiuli number', validators=[DataRequired(), NumberRange(min=1)])
+    submit = SubmitField('Lisa')
 
 
-class AddLender(FlaskForm):
-    name = StringField('name', validators=[DataRequired(), Length(max=50)])
-    surname = StringField('author', validators=[DataRequired(), Length(max=50)])
-    submit = SubmitField('submit')
+class AddLenderForm(FlaskForm):
+    name = StringField('Eesnimi', validators=[DataRequired(), Length(max=50)])
+    surname = StringField('Perekonnanimi', validators=[DataRequired(), Length(max=50)])
+    submit = SubmitField('Lisa')

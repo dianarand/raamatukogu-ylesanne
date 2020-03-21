@@ -1,6 +1,6 @@
 from flask import redirect, url_for, render_template, request, session, flash
 from libraryapp import app, db
-from libraryapp.forms import LoginForm
+from libraryapp.forms import LoginForm, AddBookForm, AddLenderForm
 from libraryapp.models import Book, Lender
 
 
@@ -54,7 +54,8 @@ def add_book():
             flash('Raamat lisatud!')
             return redirect(url_for('home'))
         else:
-            return render_template('add_book.html')
+            form = AddBookForm()
+            return render_template('add_book.html', form=form)
     else:
         flash('Ei ole sisse logitud')
         return redirect(url_for('login'))
@@ -72,7 +73,8 @@ def add_lender():
             flash('Laenutaja lisatud!')
             return redirect(url_for('home'))
         else:
-            return render_template('add_lender.html')
+            form = AddLenderForm()
+            return render_template('add_lender.html', form=form)
     else:
         flash('Ei ole sisse logitud')
         return redirect(url_for('login'))
