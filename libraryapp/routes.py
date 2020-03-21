@@ -1,36 +1,37 @@
 from flask import redirect, url_for, render_template, request, session, flash
 from libraryapp import app, db
 from libraryapp.forms import LoginForm, AddBookForm, AddLenderForm
-from libraryapp.models import Book, Lender
+from libraryapp.models import Book, Lender, User
+from flask_login import login_user, current_user, logout_user
 
 
 @app.route('/')
 def home():
-    if 'user' in session:
-        return render_template('home.html', user=session['user'])
-    else:
-        return render_template('home.html')
+    return render_template('home.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        user = request.form['username']
-        session['user'] = user
-        flash('Sisse logitud!')
+    if current_user.is_authenticated:
+        flash('Juba sisse logitud!')
         return redirect(url_for('home'))
     else:
-        if 'user' in session:
-            flash('Juba sisse logitud!')
-            return redirect(url_for('home'))
         form = LoginForm()
-        return render_template('login.html', form=form)
+        if form.validate_on_submit():
+            user = User.query.filter_by(username=form.username.data).first()
+            if user:
+                login_user(user)
+                flash('Sisse logitud!')
+                return redirect(url_for('home'))
+            else:
+                flash('Kasutajat ei ole olemas! Proovi uuesti.')
+    return render_template('login.html', form=form)
 
 
 @app.route('/logout')
 def logout():
-    if 'user' in session:
-        session.pop('user', None)
+    if current_user.is_authenticated:
+        logout_user()
         flash('Välja logitud!')
     return redirect(url_for('home'))
 
