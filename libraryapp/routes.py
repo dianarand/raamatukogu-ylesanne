@@ -109,7 +109,16 @@ def return_book(book_id):
 def delete_book(book_id):
     if not current_user.admin:
         abort(403)
-    return render_template('home.html')
+    else:
+        book = Book.query.get_or_404(book_id)
+        form = ConfirmButton()
+        if form.validate_on_submit():
+            title = book.title
+            db.session.delete(book)
+            db.session.commit()
+            flash(f'Raamat "{title}" on kustutatud')
+            return redirect(url_for('home'))
+    return render_template('delete.html', book=book, form=form)
 
 
 @app.route('/add_lender', methods=['GET', 'POST'])
