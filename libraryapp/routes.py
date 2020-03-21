@@ -45,7 +45,8 @@ def add_book():
         if request.method == 'POST':
             title = request.form['title']
             author = request.form['author']
-            book = Book(title=title, author=author)
+            location = request.form['location']
+            book = Book(title=title, author=author, location=location)
             db.session.add(book)
             db.session.commit()
             flash('Raamat lisatud!')
