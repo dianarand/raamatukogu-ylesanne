@@ -1,5 +1,6 @@
 from flask import redirect, url_for, render_template, request, session, flash
 from libraryapp import app, db
+from libraryapp.forms import LoginForm
 from libraryapp.models import Book, Lender
 
 
@@ -22,7 +23,8 @@ def login():
         if 'user' in session:
             flash('Juba sisse logitud!')
             return redirect(url_for('home'))
-        return render_template('login.html')
+        form = LoginForm()
+        return render_template('login.html', form=form)
 
 
 @app.route('/logout')
