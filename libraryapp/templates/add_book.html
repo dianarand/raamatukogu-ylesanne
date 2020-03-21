@@ -1,0 +1,13 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <h1>Lisa uus raamat</h1>
+    <form method="post" action="#">
+        <p>Pealkiri:</p>
+        <p><input type="text" name="title" /></p>
+        <p>Autor:</p>
+        <p><input type="text" name="author" /></p>
+        <p>Riiuli number:</p>
+        <p><input type="number" name="location" min="1" /></p>
+        <p><input type="submit" value="Lisa" /></p>
+    </form>
+{% endblock %}

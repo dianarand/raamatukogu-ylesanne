@@ -1,0 +1,11 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <h1>Lisa uus laenutaja</h1>
+    <form method="post" action="#">
+        <p>Eesnimi:</p>
+        <p><input type="text" name="name" /></p>
+        <p>Perekonnanimi:</p>
+        <p><input type="text" name="surname" /></p>
+        <p><input type="submit" value="Lisa" /></p>
+    </form>
+{% endblock %}
