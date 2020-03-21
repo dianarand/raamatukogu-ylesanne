@@ -4,11 +4,15 @@
     <form method="post" action="#">
         {{ form.hidden_tag() }}
         <p>
-            {{ form.name.label() }}
+            {{ form.name.label() }}:
+        </p>
+        <p>
             {{ form.name() }}
         </p>
         <p>
-            {{ form.surname.label() }}
+            {{ form.surname.label() }}:
+        </p>
+        <p>
             {{ form.surname() }}
         </p>
         <p>

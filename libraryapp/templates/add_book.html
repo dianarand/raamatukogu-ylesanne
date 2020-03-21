@@ -4,15 +4,21 @@
     <form method="post" action="#">
         {{ form.hidden_tag() }}
         <p>
-            {{ form.title.label() }}
+            {{ form.title.label() }}:
+        </p>
+        <p>
             {{ form.title() }}
         </p>
         <p>
-            {{ form.author.label() }}
+            {{ form.author.label() }}:
+        </p>
+        <p>
             {{ form.author() }}
         </p>
         <p>
-            {{ form.location.label() }}
+            {{ form.location.label() }}:
+        </p>
+        <p>
             {{ form.location() }}
         </p>
         <p>
