@@ -1,7 +1,35 @@
+from datetime import datetime
 from flask import Flask, redirect, url_for, render_template, request, session, flash
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.secret_key = 'd46de97837b274867df6ac9d2861bb9b'
+app.config['SECRET_KEY'] = 'd46de97837b274867df6ac9d2861bb9b'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///books.db'
+
+db = SQLAlchemy(app)
+
+class Book(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    author = db.Column(db.String(100), nullable=False)
+    #release_date = db.Column()
+    #location = db.Column()
+    #time_limit = db.Column(db.Integer, default=4)
+    lender_id = db.Column(db.Integer, db.ForeignKey('lender.id'))
+    #deadline = db.Column()
+
+    def __repr__(self):
+        return f'{self.title} ({self.author})'
+
+
+class Lender(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+    surname = db.Column(db.String(50), nullable=False)
+    lended_books = db.relationship('Book', backref='lender')
+
+    def __repr__(self):
+        return f'{self.surname}, {self.name}'
 
 
 @app.route('/')
