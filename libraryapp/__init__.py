@@ -9,5 +9,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///books.db'
 db = SQLAlchemy(app)
 
 login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+login_manager.login_message = 'Logi sisse, et näha seda lehte'
 
 from libraryapp import routes

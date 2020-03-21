@@ -2,7 +2,7 @@ from flask import redirect, url_for, render_template, request, session, flash
 from libraryapp import app, db
 from libraryapp.forms import LoginForm, AddBookForm, AddLenderForm
 from libraryapp.models import Book, Lender, User
-from flask_login import login_user, current_user, logout_user
+from flask_login import login_user, current_user, logout_user, login_required
 
 
 @app.route('/')
@@ -21,8 +21,12 @@ def login():
             user = User.query.filter_by(username=form.username.data).first()
             if user:
                 login_user(user)
+                next_page = request.args.get('next')
                 flash('Sisse logitud!')
-                return redirect(url_for('home'))
+                if next_page:
+                    return redirect(next_page)
+                else:
+                    redirect(url_for('home'))
             else:
                 flash('Kasutajat ei ole olemas! Proovi uuesti.')
     return render_template('login.html', form=form)
@@ -43,39 +47,35 @@ def status():
 
 
 @app.route('/add_book', methods=['GET', 'POST'])
+@login_required
 def add_book():
-    if 'user' in session:
-        if request.method == 'POST':
-            title = request.form['title']
-            author = request.form['author']
-            location = request.form['location']
+    if current_user.admin:
+        form = AddBookForm()
+        if form.validate_on_submit():
+            title = form.title.data
+            author = form.author.data
+            location = form.location.data
             book = Book(title=title, author=author, location=location)
             db.session.add(book)
             db.session.commit()
             flash('Raamat lisatud!')
             return redirect(url_for('home'))
-        else:
-            form = AddBookForm()
-            return render_template('add_book.html', form=form)
+        return render_template('add_book.html', form=form)
     else:
-        flash('Ei ole sisse logitud')
-        return redirect(url_for('login'))
+        flash('Puuduvad õigused')
+        return redirect(url_for('home'))
 
 
 @app.route('/add_lender', methods=['GET', 'POST'])
+@login_required
 def add_lender():
-    if 'user' in session:
-        if request.method == 'POST':
-            name = request.form['name']
-            surname = request.form['surname']
-            lender = Lender(name=name, surname=surname)
-            db.session.add(lender)
-            db.session.commit()
-            flash('Laenutaja lisatud!')
-            return redirect(url_for('home'))
-        else:
-            form = AddLenderForm()
-            return render_template('add_lender.html', form=form)
-    else:
-        flash('Ei ole sisse logitud')
-        return redirect(url_for('login'))
+    form = AddLenderForm()
+    if form.validate_on_submit():
+        name = form.name.data
+        surname = form.surname.data
+        lender = Lender(name=name, surname=surname)
+        db.session.add(lender)
+        db.session.commit()
+        flash('Laenutaja lisatud!')
+        return redirect(url_for('home'))
+    return render_template('add_lender.html', form=form)
