@@ -3,18 +3,15 @@
     <h1>{{ book.title }}</h1>
     <p>Autor: {{ book.author }}</p>
     <p>Asukoht: Riiul {{ book.location }}</p>
-    <p>
-        Seis:
+    <p>Seis:</p>
         {% if book.lender_id %}
-            Välja laenutatud kasutajale {{ book.lender }}
-            </p><p>
-            Tagastamise tähtaeg: {{ book.deadline }}
-        {% else %}
-            Saadaval ({{ book.availability() }})
-            </p><p>
-            Laenutuse pikkus: {{ book.time_limit() }} nädalat
+            <p>Välja laenutatud kasutajale {{ book.lender }}</p>
+            <p>Tagastamise tähtaeg: {{ book.deadline }}</p>
         {% endif %}
-    </p>
+        {% if book.availability() > 0 %}
+            <p>Saadaval ({{ book.availability() }})</p>
+            <p>Laenutuse pikkus: {{ book.time_limit() }} nädalat</p>
+        {% endif %}
     <br>
     {% if current_user.admin %}
         <p><a href="{{ url_for('delete_book', book_id=book.id) }}">Kustuta raamat</a></p>

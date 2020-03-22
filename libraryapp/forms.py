@@ -28,5 +28,17 @@ class BookLendForm(FlaskForm):
     submit = SubmitField('Laenuta')
 
 
+class BookSearchForm(FlaskForm):
+    title = StringField('Pealkiri', validators=[Length(max=100)])
+    author = StringField('Autor', validators=[Length(max=100)])
+    submit = SubmitField('Otsi')
+
+
+class LenderSearchForm(FlaskForm):
+    surname = StringField('Perekonnanimi', validators=[Length(max=50)])
+    code = StringField('Isikukood', validators=[Length(max=11)])
+    submit = SubmitField('Otsi')
+
+
 class ConfirmButton(FlaskForm):
     submit = SubmitField('Kinnita')
