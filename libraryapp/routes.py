@@ -120,7 +120,7 @@ def delete_book(book_id):
     return render_template('delete.html', book=book, form=form)
 
 
-@app.route('/add_lender', methods=['GET', 'POST'])
+@app.route('/lender/new', methods=['GET', 'POST'])
 @login_required
 def add_lender():
     form = LenderForm()
@@ -135,3 +135,10 @@ def add_lender():
         flash('Laenutaja lisatud!')
         return redirect(url_for('home'))
     return render_template('add_lender.html', title='Lisa uus laenutaja', form=form)
+
+
+@app.route('/lender/<int:lender_id>')
+@login_required
+def lender(lender_id):
+    lender = Lender.query.get_or_404(lender_id)
+    return render_template('lender.html', lender=lender)
