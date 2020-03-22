@@ -43,6 +43,10 @@ def logout():
 @app.route('/status')
 def status():
     books = Book.query.all()
+    books_filtered = []
+    for book in books:
+        if book not in books_filtered:
+            books_filtered.append(book)
     return render_template('status.html', books=books)
 
 

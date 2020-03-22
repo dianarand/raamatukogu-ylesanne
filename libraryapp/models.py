@@ -15,14 +15,26 @@ class Book(db.Model):
     def __repr__(self):
         return f'{self.title} ({self.author})'
 
+    def __eq__(self, other):
+        return self.title == other.title and self.author == other.title
+
     def availability(self):
         return len(Book.query.filter_by(title=self.title, author=self.author).all())
+
+    def locations(self):
+        books = Book.query.filter_by(title=self.title, author=self.author).all()
+        locations = []
+        for book in books:
+            if book.location not in locations:
+                locations.append(book.location)
+        locations.sort()
+        return locations
 
     def time_limit(self, custom=None):
         if custom:
             return custom
         else:
-            #if (date.today - self.date_added).months < 3:
+            # if (date.today - self.date_added).months < 3:
             #    return 1
             if self.availability() < 5:
                 return 1

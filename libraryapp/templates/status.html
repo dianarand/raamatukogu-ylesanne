@@ -13,9 +13,14 @@
         <tr>
             <td>{{ book.title }}</td>
             <td>{{ book.author }}</td>
-            <td></td>
-            <td></td>
-            <td>Riiul {{ book.location }}</td>
+            <td>{{ book.availability() }}</td>
+            <td>{{ book.time_limit() }} nädalat</td>
+            <td>
+                Riiul
+                {% for location in book.locations() %}
+                    {{ location }}
+                {% endfor %}
+            </td>
         </tr>
     {% endfor %}
     </table>
