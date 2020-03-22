@@ -1,0 +1,15 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <h1>{{ title }}</h1>
+    <p>Kustuta raamat {{ book }}</p>
+    {% if book.lender_id %}
+        <p>NB! Raamat on hetkel välja laenutatud!</p>
+    {% endif %}
+    <br>
+    <p>Olete kindel?</p>
+    <br>
+    <form method="post" action="#">
+        {{ form.hidden_tag() }}
+        <p>{{ form.submit() }}</p>
+    </form>
+{% endblock %}

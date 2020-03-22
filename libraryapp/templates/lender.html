@@ -1,0 +1,15 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <h1>{{ lender }}</h1>
+    <p>Isikukood: {{ lender.personal_code }}</p>
+    <p>
+        {% if lender.books %}
+            <p>Laenutatud raamatud:</p>
+            {% for book in lender.books %}
+                <p>{{ book }} - Tähtaeg: {{ book.deadline }}</p>
+            {% endfor %}
+        {% else %}
+           <p>Ei ole hetkel laenutatud raamatuid</p>
+        {% endif %}
+    </p>
+{% endblock %}

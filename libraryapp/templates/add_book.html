@@ -5,24 +5,25 @@
         {{ form.hidden_tag() }}
         <p>
             {{ form.title.label() }}:
+            {% if form.title.errors %}
+                Sisesta raamatu pealkiri (maksimaalne pikkus 100 tähemärki)
+            {% endif %}
         </p>
-        <p>
-            {{ form.title() }}
-        </p>
+        <p>{{ form.title() }}</p>
         <p>
             {{ form.author.label() }}:
+            {% if form.title.errors %}
+                Sisesta raamatu autor (maksimaalne pikkus 100 tähemärki)
+            {% endif %}
         </p>
-        <p>
-            {{ form.author() }}
-        </p>
+        <p>{{ form.author() }}</p>
         <p>
             {{ form.location.label() }}:
+            {% if form.location.errors %}
+                Sisesta riiuli number
+            {% endif %}
         </p>
-        <p>
-            {{ form.location() }}
-        </p>
-        <p>
-            {{ form.submit() }}
-        </p>
+        <p>{{ form.location() }}</p>
+        <p>{{ form.submit() }}</p>
     </form>
 {% endblock %}

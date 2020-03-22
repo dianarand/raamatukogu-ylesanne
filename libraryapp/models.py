@@ -7,25 +7,59 @@ class Book(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     author = db.Column(db.String(100), nullable=False)
-    date_added = db.Column(db.Date, default=date.today, nullable=False)
     location = db.Column(db.Integer, nullable=False)
-    # time_limit = db.Column(db.Integer, default=4, nullable=False)
+    date_added = db.Column(db.Date, default=date.today(), nullable=False)
     lender_id = db.Column(db.Integer, db.ForeignKey('lender.id'))
-
-    # deadline = db.Column(db.Date, default=(date.today() + timedelta(weeks=self.time_limit)))
+    deadline = db.Column(db.Date)
 
     def __repr__(self):
         return f'{self.title} ({self.author})'
+
+    def availability(self):
+        return len(Book.query.filter_by(title=self.title, author=self.author, lender_id=None).all())
+
+    def locations(self):
+        books = Book.query.filter_by(title=self.title, author=self.author, lender_id=None).all()
+        locations = []
+        for book in books:
+            if book.location not in locations:
+                locations.append(book.location)
+        locations.sort()
+        return locations
+
+    def time_limit(self):
+        if (date.today() - self.date_added).days / 30 < 3:
+            return 1
+        if self.availability() < 5:
+            return 1
+        else:
+            return 4
+
+    def overtime(self):
+        days = (date.today() - self.deadline).days
+        if days > 0:
+            return days
+        else:
+            return None
+
+    def checkout(self, lender_id):
+        self.deadline = date.today() + timedelta(weeks=self.time_limit())
+        self.lender_id = lender_id
+
+    def checkin(self):
+        self.lender_id = None
+        self.deadline = None
 
 
 class Lender(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     surname = db.Column(db.String(50), nullable=False)
-    lended_books = db.relationship('Book', backref='lender')
+    personal_code = db.Column(db.String(11), nullable=False)
+    books = db.relationship('Book', backref='lender')
 
     def __repr__(self):
-        return f'{self.surname}, {self.name}'
+        return f'{self.name} {self.surname}'
 
 
 class User(db.Model, UserMixin):

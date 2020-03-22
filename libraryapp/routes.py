@@ -1,6 +1,7 @@
-from flask import redirect, url_for, render_template, request, flash
+from datetime import date
+from flask import redirect, url_for, render_template, request, flash, abort
 from libraryapp import app, db
-from libraryapp.forms import LoginForm, AddBookForm, AddLenderForm
+from libraryapp.forms import LoginForm, BookForm, LenderForm, BookLendForm, ConfirmButton
 from libraryapp.models import Book, Lender, User
 from flask_login import login_user, current_user, logout_user, login_required
 
@@ -26,7 +27,7 @@ def login():
                 if next_page:
                     return redirect(next_page)
                 else:
-                    redirect(url_for('home'))
+                    return redirect(url_for('home'))
             else:
                 flash('Kasutajat ei ole olemas! Proovi uuesti.')
     return render_template('login.html', form=form)
@@ -42,40 +43,121 @@ def logout():
 
 @app.route('/status')
 def status():
-    books = Book.query.all()
-    return render_template('status.html', books=books)
+    available_books = Book.query.filter_by(lender_id=None).all()
+    book_list = []
+    for book in available_books:
+        tba = Book.query.filter_by(title=book.title, author=book.author, lender_id=None).first()
+        if tba not in book_list:
+            book_list.append(tba)
+    return render_template('status.html', books=book_list)
 
 
-@app.route('/add_book', methods=['GET', 'POST'])
+@app.route('/book/new', methods=['GET', 'POST'])
 @login_required
 def add_book():
-    if current_user.admin:
-        form = AddBookForm()
+    if not current_user.admin:
+        abort(403)
+    else:
+        form = BookForm()
         if form.validate_on_submit():
-            title = form.title.data
-            author = form.author.data
-            location = form.location.data
-            book = Book(title=title, author=author, location=location)
+            book = Book(
+                title=form.title.data,
+                author=form.author.data,
+                location=form.location.data
+            )
             db.session.add(book)
             db.session.commit()
             flash('Raamat lisatud!')
             return redirect(url_for('home'))
         return render_template('add_book.html', form=form)
-    else:
-        flash('Puuduvad õigused')
+
+
+@app.route('/book/<int:book_id>')
+@login_required
+def book(book_id):
+    book = Book.query.get_or_404(book_id)
+    return render_template('book.html', book=book)
+
+
+@app.route('/book/<int:book_id>/lend', methods=['GET', 'POST'])
+@login_required
+def lend_book(book_id):
+    book = Book.query.get_or_404(book_id)
+    form = BookLendForm()
+    # form.time_limit.data = book.time_limit()
+    if form.validate_on_submit():
+        lender = Lender.query.filter_by(personal_code=form.code.data).first()
+        if lender:
+            book.checkout(lender_id=lender.id)
+            db.session.commit()
+            flash(f'Raamat on laenutatud kasutajale {lender}')
+            return redirect(url_for('home'))
+        else:
+            flash('Laenutajat ei ole olemas! Proovi uuesti.')
+    return render_template('add_lender.html', title='Raamatu laenutamine', book=book, form=form)
+
+
+@app.route('/book/<int:book_id>/return', methods=['GET', 'POST'])
+@login_required
+def return_book(book_id):
+    book = Book.query.get_or_404(book_id)
+    lender = Lender.query.get(book.lender_id)
+    form = ConfirmButton()
+    if form.validate_on_submit():
+        book.checkin()
+        db.session.commit()
+        flash(f'Raamat "{book.title}" on tagastatud kasutajalt {lender}')
         return redirect(url_for('home'))
+    return render_template('add_lender.html', title='Raamatu tagastamine', book=book, lender=lender, form=form)
 
 
-@app.route('/add_lender', methods=['GET', 'POST'])
+@app.route('/book/<int:book_id>/delete', methods=['GET', 'POST'])
+@login_required
+def delete_book(book_id):
+    if not current_user.admin:
+        abort(403)
+    else:
+        book = Book.query.get_or_404(book_id)
+        form = ConfirmButton()
+        if form.validate_on_submit():
+            title = book.title
+            db.session.delete(book)
+            db.session.commit()
+            flash(f'Raamat "{title}" on kustutatud')
+            return redirect(url_for('home'))
+    return render_template('delete.html', book=book, form=form)
+
+
+@app.route('/lender/new', methods=['GET', 'POST'])
 @login_required
 def add_lender():
-    form = AddLenderForm()
+    form = LenderForm()
     if form.validate_on_submit():
-        name = form.name.data
-        surname = form.surname.data
-        lender = Lender(name=name, surname=surname)
+        lender = Lender(
+            name=form.name.data,
+            surname=form.surname.data,
+            personal_code=form.code.data
+        )
         db.session.add(lender)
         db.session.commit()
         flash('Laenutaja lisatud!')
         return redirect(url_for('home'))
-    return render_template('add_lender.html', form=form)
+    return render_template('add_lender.html', title='Lisa uus laenutaja', form=form)
+
+
+@app.route('/lender/<int:lender_id>')
+@login_required
+def lender(lender_id):
+    lender = Lender.query.get_or_404(lender_id)
+    return render_template('lender.html', lender=lender)
+
+
+@app.route('/overtime')
+@login_required
+def overtime():
+    lended_books = Book.query.filter(Book.deadline != None)
+    overtime_books = []
+    for book in lended_books:
+        if book.deadline < date.today():
+            overtime_books.append(book)
+    return render_template('overtime.html', books=overtime_books)

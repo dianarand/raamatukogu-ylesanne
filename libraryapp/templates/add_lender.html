@@ -1,22 +1,41 @@
 {% extends 'layout.html' %}
 {% block content %}
-    <h1>Lisa uus laenutaja</h1>
+    <h1>{{ title }}</h1>
+    {% if book %}
+        <p>Raamat: {{ book }}</p>
+    {% endif %}
+    {% if lender %}
+        <p>Raamatut tagastab laenutaja {{ lender }}</p>
+    {% endif %}
     <form method="post" action="#">
         {{ form.hidden_tag() }}
-        <p>
-            {{ form.name.label() }}:
-        </p>
-        <p>
-            {{ form.name() }}
-        </p>
-        <p>
-            {{ form.surname.label() }}:
-        </p>
-        <p>
-            {{ form.surname() }}
-        </p>
-        <p>
-            {{ form.submit() }}
-        </p>
+        {% if form.name %}
+            <p>
+                {{ form.name.label() }}:
+                {% if form.name.errors %}
+                    Sisesta kasutaja eesnimi (maksimaalne pikkus 50 tähemärki)
+                {% endif %}
+            </p>
+            <p>{{ form.name() }}</p>
+        {% endif %}
+        {% if form.surname %}
+            <p>
+                {{ form.surname.label() }}:
+                {% if form.surname.errors %}
+                    Sisesta kasutaja perekonnanimi (maksimaalne pikkus 50 tähemärki)
+                {% endif %}
+            </p>
+            <p>{{ form.surname() }}</p>
+        {% endif %}
+        {% if form.code %}
+            <p>
+                {{ form.code.label() }}:
+                {% if form.code.errors %}
+                    Sisesta kasutaja isikukood (kohustuslik pikkus 11 numbrit)
+                {% endif %}
+            </p>
+            <p>{{ form.code() }}</p>
+        {% endif %}
+        <p>{{ form.submit() }}</p>
     </form>
 {% endblock %}

@@ -8,14 +8,25 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Sisene')
 
 
-class AddBookForm(FlaskForm):
+class BookForm(FlaskForm):
     title = StringField('Pealkiri', validators=[DataRequired(), Length(max=100)])
     author = StringField('Autor', validators=[DataRequired(), Length(max=100)])
     location = IntegerField('Riiuli number', validators=[DataRequired(), NumberRange(min=1)])
     submit = SubmitField('Lisa')
 
 
-class AddLenderForm(FlaskForm):
+class LenderForm(FlaskForm):
     name = StringField('Eesnimi', validators=[DataRequired(), Length(max=50)])
     surname = StringField('Perekonnanimi', validators=[DataRequired(), Length(max=50)])
+    code = StringField('Isikukood', validators=[DataRequired(), Length(min=11, max=11)])
     submit = SubmitField('Lisa')
+
+
+class BookLendForm(FlaskForm):
+    # time_limit = IntegerField('Laenutuse pikkus')
+    code = StringField('Isikukood', validators=[DataRequired(), Length(min=11, max=11)])
+    submit = SubmitField('Laenuta')
+
+
+class ConfirmButton(FlaskForm):
+    submit = SubmitField('Kinnita')
