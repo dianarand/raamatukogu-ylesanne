@@ -35,10 +35,16 @@ class Book(db.Model):
         else:
             return 4
 
+    def overtime(self):
+        days = (date.today() - self.deadline).days
+        if days > 0:
+            return days
+        else:
+            return None
+
     def checkout(self, lender_id):
         self.deadline = date.today() + timedelta(weeks=self.time_limit())
         self.lender_id = lender_id
-
 
     def checkin(self):
         self.lender_id = None

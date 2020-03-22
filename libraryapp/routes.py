@@ -1,3 +1,4 @@
+from datetime import date
 from flask import redirect, url_for, render_template, request, flash, abort
 from libraryapp import app, db
 from libraryapp.forms import LoginForm, BookForm, LenderForm, BookLendForm, ConfirmButton
@@ -149,3 +150,14 @@ def add_lender():
 def lender(lender_id):
     lender = Lender.query.get_or_404(lender_id)
     return render_template('lender.html', lender=lender)
+
+
+@app.route('/overtime')
+@login_required
+def overtime():
+    lended_books = Book.query.filter(Book.deadline != None)
+    overtime_books = []
+    for book in lended_books:
+        if book.deadline < date.today():
+            overtime_books.append(book)
+    return render_template('overtime.html', books=overtime_books)
