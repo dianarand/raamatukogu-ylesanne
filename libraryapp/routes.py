@@ -1,7 +1,7 @@
 from datetime import date
 from flask import redirect, url_for, render_template, request, flash, abort
 from libraryapp import app, db
-from libraryapp.forms import LoginForm, BookForm, LenderForm, BookLendForm, BookSearchForm, ConfirmButton
+from libraryapp.forms import LoginForm, BookForm, LenderForm, BookLendForm, BookSearchForm, LenderSearchForm, ConfirmButton
 from libraryapp.models import Book, Lender, User
 from flask_login import login_user, current_user, logout_user, login_required
 
@@ -78,7 +78,7 @@ def book_search():
     form = BookSearchForm()
     if form.validate_on_submit():
         if form.title.data and form.author.data:
-            result = Book.query.filter_by(title=form.title.data).all()
+            result = Book.query.filter_by(title=form.title.data, author=form.author.data).all()
         elif form.title.data:
             result = Book.query.filter_by(title=form.title.data).all()
         elif form.author.data:
@@ -161,6 +161,24 @@ def add_lender():
         flash('Laenutaja lisatud!')
         return redirect(url_for('home'))
     return render_template('add_lender.html', title='Lisa uus laenutaja', form=form)
+
+
+@app.route('/lender/search', methods=['GET', 'POST'])
+@login_required
+def lender_search():
+    form = LenderSearchForm()
+    if form.validate_on_submit():
+        if form.surname.data and form.code.data:
+            result = Lender.query.filter_by(surname=form.surname.data, personal_code=form.code.data).all()
+        elif form.surname.data:
+            result = Lender.query.filter_by(surname=form.surname.data).all()
+        elif form.code.data:
+            result = Lender.query.filter_by(personal_code=form.code.data).all()
+        else:
+            flash('Sisesta info')
+            return render_template('search.html', title='Laenutaja otsing', form=form)
+        return render_template('lender_result.html', result=result)
+    return render_template('search.html', title='Laenutaja otsing', form=form)
 
 
 @app.route('/lender/<int:lender_id>')
