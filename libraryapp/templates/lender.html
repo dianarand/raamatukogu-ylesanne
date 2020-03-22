@@ -6,7 +6,7 @@
         {% if lender.books %}
             <p>Laenutatud raamatud:</p>
             {% for book in lender.books %}
-                {{ book }}
+                <p>{{ book }} - Tähtaeg: {{ book.deadline }}</p>
             {% endfor %}
         {% else %}
            <p>Ei ole hetkel laenutatud raamatuid</p>

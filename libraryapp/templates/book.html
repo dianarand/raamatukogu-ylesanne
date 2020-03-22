@@ -7,8 +7,12 @@
         Seis:
         {% if book.lender_id %}
             Välja laenutatud kasutajale {{ book.lender }}
+            </p><p>
+            Tagastamise tähtaeg: {{ book.deadline }}
         {% else %}
-            Saadaval
+            Saadaval ({{ book.availability() }})
+            </p><p>
+            Laenutuse pikkus: {{ book.time_limit() }} nädalat
         {% endif %}
     </p>
     <br>

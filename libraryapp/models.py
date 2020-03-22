@@ -8,7 +8,7 @@ class Book(db.Model):
     title = db.Column(db.String(100), nullable=False)
     author = db.Column(db.String(100), nullable=False)
     location = db.Column(db.Integer, nullable=False)
-    date_added = db.Column(db.Date, default=date.today, nullable=False)
+    date_added = db.Column(db.Date, default=date.today(), nullable=False)
     lender_id = db.Column(db.Integer, db.ForeignKey('lender.id'))
     deadline = db.Column(db.Date)
 
@@ -27,20 +27,18 @@ class Book(db.Model):
         locations.sort()
         return locations
 
-    def time_limit(self, custom=None):
-        if custom:
-            return custom
+    def time_limit(self):
+        if (date.today() - self.date_added).days / 30 < 3:
+            return 1
+        if self.availability() < 5:
+            return 1
         else:
-            # if (date.today - self.date_added).months < 3:
-            #    return 1
-            if self.availability() < 5:
-                return 1
-            else:
-                return 4
+            return 4
 
-    def checkout(self, lender_id, limit=None):
+    def checkout(self, lender_id):
+        self.deadline = date.today() + timedelta(weeks=self.time_limit())
         self.lender_id = lender_id
-        self.deadline = date.today() + timedelta(weeks=self.time_limit(limit))
+
 
     def checkin(self):
         self.lender_id = None

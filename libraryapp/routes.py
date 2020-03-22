@@ -83,10 +83,11 @@ def book(book_id):
 def lend_book(book_id):
     book = Book.query.get_or_404(book_id)
     form = BookLendForm()
+    # form.time_limit.data = book.time_limit()
     if form.validate_on_submit():
         lender = Lender.query.filter_by(personal_code=form.code.data).first()
         if lender:
-            book.checkout(lender.id)
+            book.checkout(lender_id=lender.id)
             db.session.commit()
             flash(f'Raamat on laenutatud kasutajale {lender}')
             return redirect(url_for('home'))

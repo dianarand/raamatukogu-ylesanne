@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, IntegerField, DateField
+from wtforms import StringField, SubmitField, IntegerField
 from wtforms.validators import DataRequired, Length, NumberRange
 
 
@@ -23,6 +23,7 @@ class LenderForm(FlaskForm):
 
 
 class BookLendForm(FlaskForm):
+    # time_limit = IntegerField('Laenutuse pikkus')
     code = StringField('Isikukood', validators=[DataRequired(), Length(min=11, max=11)])
     submit = SubmitField('Laenuta')
 
