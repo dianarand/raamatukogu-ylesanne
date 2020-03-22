@@ -42,8 +42,13 @@ def logout():
 
 @app.route('/status')
 def status():
-    books = Book.query.all()
-    return render_template('status.html', books=books)
+    available_books = Book.query.filter_by(lender_id=None).all()
+    book_list = []
+    for book in available_books:
+        tba = Book.query.filter_by(title=book.title, author=book.author, lender_id=None).first()
+        if tba not in book_list:
+            book_list.append(tba)
+    return render_template('status.html', books=book_list)
 
 
 @app.route('/book/new', methods=['GET', 'POST'])

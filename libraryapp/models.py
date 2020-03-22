@@ -16,10 +16,10 @@ class Book(db.Model):
         return f'{self.title} ({self.author})'
 
     def availability(self):
-        return len(Book.query.filter_by(title=self.title, author=self.author).all())
+        return len(Book.query.filter_by(title=self.title, author=self.author, lender_id=None).all())
 
     def locations(self):
-        books = Book.query.filter_by(title=self.title, author=self.author).all()
+        books = Book.query.filter_by(title=self.title, author=self.author, lender_id=None).all()
         locations = []
         for book in books:
             if book.location not in locations:
