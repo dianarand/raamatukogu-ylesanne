@@ -57,8 +57,7 @@ def add_book():
             book = Book(
                 title=form.title.data,
                 author=form.author.data,
-                location=form.location.data,
-                date_added=form.date_added.data
+                location=form.location.data
             )
             db.session.add(book)
             db.session.commit()
@@ -82,7 +81,8 @@ def lend_book(book_id):
     if form.validate_on_submit():
         lender = Lender.query.filter_by(personal_code=form.code.data).first()
         if lender:
-            book.checkout(lender_id)
+            book.checkout(lender.id)
+            db.session.commit()
             flash(f'Raamat on laenutatud kasutajale {lender}')
             return redirect(url_for('home'))
         else:
@@ -98,6 +98,7 @@ def return_book(book_id):
     form = ConfirmButton()
     if form.validate_on_submit():
         book.checkin()
+        db.session.commit()
         flash(f'Raamat "{book.title}" on tagastatud kasutajalt {lender}')
         return redirect(url_for('home'))
     return render_template('add_lender.html', title='Raamatu tagastamine', book=book, lender=lender, form=form)

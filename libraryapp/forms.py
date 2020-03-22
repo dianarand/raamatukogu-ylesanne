@@ -12,7 +12,6 @@ class BookForm(FlaskForm):
     title = StringField('Pealkiri', validators=[DataRequired(), Length(max=100)])
     author = StringField('Autor', validators=[DataRequired(), Length(max=100)])
     location = IntegerField('Riiuli number', validators=[DataRequired(), NumberRange(min=1)])
-    date_added = DateField('Lisamise aeg')
     submit = SubmitField('Lisa')
 
 

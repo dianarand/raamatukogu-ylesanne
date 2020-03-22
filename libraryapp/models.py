@@ -22,9 +22,9 @@ class Book(db.Model):
         if custom:
             return custom
         else:
-            if (date.today - self.date_added).months < 3:
-                return 1
-            elif self.availability() < 5:
+            #if (date.today - self.date_added).months < 3:
+            #    return 1
+            if self.availability() < 5:
                 return 1
             else:
                 return 4
