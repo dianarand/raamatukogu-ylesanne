@@ -28,5 +28,11 @@ class BookLendForm(FlaskForm):
     submit = SubmitField('Laenuta')
 
 
+class BookSearchForm(FlaskForm):
+    title = StringField('Pealkiri', validators=[Length(max=100)])
+    author = StringField('Autor', validators=[Length(max=100)])
+    submit = SubmitField('Otsi')
+
+
 class ConfirmButton(FlaskForm):
     submit = SubmitField('Kinnita')

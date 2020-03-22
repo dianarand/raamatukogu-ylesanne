@@ -1,0 +1,26 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <h1>{{ title }}</h1>
+    <form method="post" action="#">
+        {{ form.hidden_tag() }}
+        {% if form.title %}
+            <p>
+                {{ form.title.label() }}:
+                {% if form.title.errors %}
+                    Maksimaalne pikkus 100 tähemärki
+                {% endif %}
+            </p>
+            <p>{{ form.title() }}</p>
+        {% endif %}
+        {% if form.author %}
+            <p>
+                {{ form.author.label() }}:
+                {% if form.author.errors %}
+                    Maksimaalne pikkus 100 tähemärki)
+                {% endif %}
+            </p>
+            <p>{{ form.author() }}</p>
+        {% endif %}
+        <p>{{ form.submit() }}</p>
+    </form>
+{% endblock %}

@@ -1,7 +1,7 @@
 from datetime import date
 from flask import redirect, url_for, render_template, request, flash, abort
 from libraryapp import app, db
-from libraryapp.forms import LoginForm, BookForm, LenderForm, BookLendForm, ConfirmButton
+from libraryapp.forms import LoginForm, BookForm, LenderForm, BookLendForm, BookSearchForm, ConfirmButton
 from libraryapp.models import Book, Lender, User
 from flask_login import login_user, current_user, logout_user, login_required
 
@@ -70,6 +70,24 @@ def add_book():
             flash('Raamat lisatud!')
             return redirect(url_for('home'))
         return render_template('add_book.html', form=form)
+
+
+@app.route('/book/search', methods=['GET', 'POST'])
+@login_required
+def book_search():
+    form = BookSearchForm()
+    if form.validate_on_submit():
+        if form.title.data and form.author.data:
+            result = Book.query.filter_by(title=form.title.data).all()
+        elif form.title.data:
+            result = Book.query.filter_by(title=form.title.data).all()
+        elif form.author.data:
+            result = Book.query.filter_by(author=form.author.data).all()
+        else:
+            flash('Sisesta info')
+            return render_template('search.html', title='Raamatu otsing', form=form)
+        return render_template('book_result.html', result=result)
+    return render_template('search.html', title='Raamatu otsing', form=form)
 
 
 @app.route('/book/<int:book_id>')
