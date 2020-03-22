@@ -57,7 +57,8 @@ def add_book():
             book = Book(
                 title=form.title.data,
                 author=form.author.data,
-                location=form.location.data
+                location=form.location.data,
+                date_added=form.date_added.data
             )
             db.session.add(book)
             db.session.commit()
@@ -81,13 +82,12 @@ def lend_book(book_id):
     if form.validate_on_submit():
         lender = Lender.query.filter_by(personal_code=form.code.data).first()
         if lender:
-            book.lender_id = lender.id
-            db.session.commit()
+            book.checkout(lender_id)
             flash(f'Raamat on laenutatud kasutajale {lender}')
             return redirect(url_for('home'))
         else:
             flash('Laenutajat ei ole olemas! Proovi uuesti.')
-    return render_template('lender.html', title='Raamatu laenutamine', book=book, form=form)
+    return render_template('add_lender.html', title='Raamatu laenutamine', book=book, form=form)
 
 
 @app.route('/book/<int:book_id>/return', methods=['GET', 'POST'])
@@ -97,11 +97,10 @@ def return_book(book_id):
     lender = Lender.query.get(book.lender_id)
     form = ConfirmButton()
     if form.validate_on_submit():
-        book.lender_id = None
-        db.session.commit()
+        book.checkin()
         flash(f'Raamat "{book.title}" on tagastatud kasutajalt {lender}')
         return redirect(url_for('home'))
-    return render_template('lender.html', title='Raamatu tagastamine', book=book, lender=lender, form=form)
+    return render_template('add_lender.html', title='Raamatu tagastamine', book=book, lender=lender, form=form)
 
 
 @app.route('/book/<int:book_id>/delete', methods=['GET', 'POST'])
@@ -135,4 +134,4 @@ def add_lender():
         db.session.commit()
         flash('Laenutaja lisatud!')
         return redirect(url_for('home'))
-    return render_template('lender.html', title='Lisa uus laenutaja', form=form)
+    return render_template('add_lender.html', title='Lisa uus laenutaja', form=form)

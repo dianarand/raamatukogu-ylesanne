@@ -29,7 +29,7 @@ class Book(db.Model):
             else:
                 return 4
 
-    def checkout(self, lender_id, limit):
+    def checkout(self, lender_id, limit=None):
         self.lender_id = lender_id
         self.deadline = date.today() + timedelta(weeks=self.time_limit(limit))
 
@@ -43,7 +43,7 @@ class Lender(db.Model):
     name = db.Column(db.String(50), nullable=False)
     surname = db.Column(db.String(50), nullable=False)
     personal_code = db.Column(db.String(11), nullable=False)
-    lended_books = db.relationship('Book', backref='lender')
+    books = db.relationship('Book', backref='lender')
 
     def __repr__(self):
         return f'{self.name} {self.surname}'

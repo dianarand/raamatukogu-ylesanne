@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, IntegerField
+from wtforms import StringField, SubmitField, IntegerField, DateField
 from wtforms.validators import DataRequired, Length, NumberRange
 
 
@@ -12,6 +12,7 @@ class BookForm(FlaskForm):
     title = StringField('Pealkiri', validators=[DataRequired(), Length(max=100)])
     author = StringField('Autor', validators=[DataRequired(), Length(max=100)])
     location = IntegerField('Riiuli number', validators=[DataRequired(), NumberRange(min=1)])
+    date_added = DateField('Lisamise aeg')
     submit = SubmitField('Lisa')
 
 
@@ -21,9 +22,11 @@ class LenderForm(FlaskForm):
     code = StringField('Isikukood', validators=[DataRequired(), Length(min=11, max=11)])
     submit = SubmitField('Lisa')
 
+
 class BookLendForm(FlaskForm):
     code = StringField('Isikukood', validators=[DataRequired(), Length(min=11, max=11)])
     submit = SubmitField('Laenuta')
+
 
 class ConfirmButton(FlaskForm):
     submit = SubmitField('Kinnita')
