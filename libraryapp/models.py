@@ -15,9 +15,6 @@ class Book(db.Model):
     def __repr__(self):
         return f'{self.title} ({self.author})'
 
-    def __eq__(self, other):
-        return self.title == other.title and self.author == other.title
-
     def availability(self):
         return len(Book.query.filter_by(title=self.title, author=self.author).all())
 
