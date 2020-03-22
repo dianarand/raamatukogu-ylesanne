@@ -2,20 +2,20 @@
 {% block content %}
     <h1>Raamatukogu</h1>
     {% if current_user.is_authenticated %}
-        <p><a href="{{ url_for('logout') }}">Logi välja</a></p>
+        <p><a href="{{ url_for('main.logout') }}">Logi välja</a></p>
     {% else %}
-        <p><a href="{{ url_for('login') }}">Logi sisse</a></p>
+        <p><a href="{{ url_for('main.login') }}">Logi sisse</a></p>
     {% endif %}
-    <p><a href="{{ url_for('status') }}">Raamatukogu üldine seis</a></p>
+    <p><a href="{{ url_for('main.status') }}">Raamatukogu üldine seis</a></p>
     {% if current_user.is_authenticated %}
         <br>
-        <p><a href="{{ url_for('book_search') }}">Raamatu otsing</a></p>
+        <p><a href="{{ url_for('books.book_search') }}">Raamatu otsing</a></p>
         {% if current_user.admin %}
-            <p><a href="{{ url_for('add_book') }}">Lisa uus raamat</a></p>
+            <p><a href="{{ url_for('books.add_book') }}">Lisa uus raamat</a></p>
         {% endif %}
-        <p><a href="{{ url_for('lender_search') }}">Laenutaja otsing</a></p>
-        <p><a href="{{ url_for('add_lender') }}">Lisa uus laenutaja</a></p>
+        <p><a href="{{ url_for('lenders.lender_search') }}">Laenutaja otsing</a></p>
+        <p><a href="{{ url_for('lenders.add_lender') }}">Lisa uus laenutaja</a></p>
         <br>
-        <p><a href="{{ url_for('overtime') }}">Üle aja läinud laenutajad</a></p>
+        <p><a href="{{ url_for('main.overtime') }}">Üle aja läinud laenutajad</a></p>
     {% endif %}
 {% endblock %}

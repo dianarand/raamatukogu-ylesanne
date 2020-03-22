@@ -11,7 +11,7 @@
     {% for lender in result %}
         <tr>
             <td>
-                <a href="{{ url_for('lender', lender_id=lender.id) }}">
+                <a href="{{ url_for('lenders.lender', lender_id=lender.id) }}">
                     {{ lender }}
                 </a>
             </td>
