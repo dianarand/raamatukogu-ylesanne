@@ -10,15 +10,30 @@
     <form method="post" action="#">
         {{ form.hidden_tag() }}
         {% if form.name %}
-            <p>{{ form.name.label() }}:</p>
+            <p>
+                {{ form.name.label() }}:
+                {% if form.name.errors %}
+                    Sisesta kasutaja eesnimi (maksimaalne pikkus 50 tähemärki)
+                {% endif %}
+            </p>
             <p>{{ form.name() }}</p>
         {% endif %}
         {% if form.surname %}
-            <p>{{ form.surname.label() }}:</p>
+            <p>
+                {{ form.surname.label() }}:
+                {% if form.surname.errors %}
+                    Sisesta kasutaja perekonnanimi (maksimaalne pikkus 50 tähemärki)
+                {% endif %}
+            </p>
             <p>{{ form.surname() }}</p>
         {% endif %}
         {% if form.code %}
-            <p>{{ form.code.label() }}:</p>
+            <p>
+                {{ form.code.label() }}:
+                {% if form.code.errors %}
+                    Sisesta kasutaja isikukood (kohustuslik pikkus 11 numbrit)
+                {% endif %}
+            </p>
             <p>{{ form.code() }}</p>
         {% endif %}
         <p>{{ form.submit() }}</p>
