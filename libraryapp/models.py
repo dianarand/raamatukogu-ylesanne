@@ -7,14 +7,35 @@ class Book(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     author = db.Column(db.String(100), nullable=False)
-    date_added = db.Column(db.Date, default=date.today, nullable=False)
     location = db.Column(db.Integer, nullable=False)
-    # time_limit = db.Column(db.Integer, default=4, nullable=False)
+    date_added = db.Column(db.Date, default=date.today, nullable=False)
     lender_id = db.Column(db.Integer, db.ForeignKey('lender.id'))
-    # deadline = db.Column(db.Date, default=(date.today() + timedelta(weeks=self.time_limit)))
+    deadline = db.Column(db.Date)
 
     def __repr__(self):
         return f'{self.title} ({self.author})'
+
+    def availability(self):
+        return len(Book.query.filter_by(title=self.title, author=self.author).all())
+
+    def time_limit(self, custom=None):
+        if custom:
+            return custom
+        else:
+            if (date.today - self.date_added).months < 3:
+                return 1
+            elif self.availability() < 5:
+                return 1
+            else:
+                return 4
+
+    def checkout(self, lender_id, limit):
+        self.lender_id = lender_id
+        self.deadline = date.today() + timedelta(weeks=self.time_limit(limit))
+
+    def checkin(self):
+        self.lender_id = None
+        self.deadline = None
 
 
 class Lender(db.Model):
