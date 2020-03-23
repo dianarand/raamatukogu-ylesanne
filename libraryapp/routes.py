@@ -71,13 +71,13 @@ def get_overtime_lenders(current_user):
             overtime_books.append(curr_book)
     output = []
     for curr_book in overtime_books:
-        data = {
+        book_data = {
             'lender': curr_book.lender.name + ' ' + curr_book.lender.surname,
             'title': curr_book.title,
             'overtime': curr_book.overtime()
         }
-        output.append(data)
-    return jsonify({'overtime': output})
+        output.append(book_data)
+    return jsonify({'overtime_books': output})
 
 
 @app.route('/book', methods=['POST'])
@@ -98,14 +98,14 @@ def get_book(current_user, book_id):
     curr_book = Book.query.get(book_id)
     if not curr_book:
         return jsonify({'message': 'Pole sellist raamatut!'})
-    data = {
+    book_data = {
         'title': curr_book.title,
         'author': curr_book.author,
         'availability': curr_book.availability(),
         'time_limit': curr_book.time_limit(),
         'location': curr_book.location
     }
-    return jsonify({'book': data})
+    return jsonify({'book': book_data})
 
 
 @app.route('/book/<int:book_id>', methods=['POST'])
@@ -148,6 +148,30 @@ def checkout_book(current_user, book_id, lender_id):
     return jsonify({'message': 'Raamat on välja laenutatud!'})
 
 
+@app.route('/book/search', methods=['POST'])
+@token_required
+def book_search(current_user):
+    data = request.get_json()
+    if 'title' in data and 'author' in data:
+        book_list = Book.query.filter_by(title=data['title'], author=data['author']).all()
+    elif 'title' in data:
+        book_list = Book.query.filter_by(title=data['title']).all()
+    elif 'author' in data:
+        book_list = Book.query.filter_by(author=data['author']).all()
+    else:
+        return jsonify({'message': 'Sisesta otsingu info!'})
+    output = []
+    for curr_book in book_list:
+        book_data = {
+            'title': curr_book.title,
+            'author': curr_book.author,
+            'time_limit': curr_book.time_limit(),
+            'location': curr_book.location
+        }
+        output.append(book_data)
+    return jsonify({'books': output})
+
+
 @app.route('/lender', methods=['POST'])
 @token_required
 def create_lender(current_user):
@@ -164,10 +188,34 @@ def get_lender(current_user, lender_id):
     curr_lender = Lender.query.get(lender_id)
     if not curr_lender:
         return jsonify({'message': 'Pole sellist laenutajat!'})
-    data = {
+    lender_data = {
         'name': curr_lender.name,
         'surname': curr_lender.surname,
         'personal_code': curr_lender.personal_code,
         'lended_books': [book.title for book in curr_lender.books]
     }
-    return jsonify({'lender': data})
+    return jsonify({'lender': lender_data})
+
+
+@app.route('/lender/search', methods=['POST'])
+@token_required
+def lender_search(current_user):
+    data = request.get_json()
+    if 'surname' and 'personal_code' in data:
+        lender_list = Lender.query.filter_by(surname=data['surname'], personal_code=data['personal_code']).all()
+    elif 'surname' in data:
+        lender_list = Lender.query.filter_by(surname=data['surname']).all()
+    elif 'personal_code' in data:
+        lender_list = Lender.query.filter_by(personal_code=data['personal_code']).all()
+    else:
+        return jsonify({'message': 'Sisesta otsingu info!'})
+    output = []
+    for curr_lender in lender_list:
+        lender_data = {
+            'name': curr_lender.name,
+            'surname': curr_lender.surname,
+            'personal_code': curr_lender.personal_code,
+            'lended_books': [book.title for book in curr_lender.books]
+        }
+        output.append(lender_data)
+    return jsonify({'lender': output})
