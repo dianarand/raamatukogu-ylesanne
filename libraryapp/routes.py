@@ -18,6 +18,10 @@ logger.setLevel(logging.INFO)
 logger.addHandler(file_handler)
 
 
+def log_info(current_user, message):
+    logger.info(f'{current_user.username} : {message}')
+
+
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -25,33 +29,35 @@ def token_required(f):
         if 'x-access-token' in request.headers:
             token = request.headers['x-access-token']
         if not token:
+            logger.info('Token not found')
             return jsonify({'message': 'Puudub token!'})
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'])
             current_user = User.query.get(data['id'])
         except:
+            logger.info('Token not valid')
             return jsonify({'message': 'Token ei kehti!'})
         return f(current_user, *args, **kwargs)
-
     return decorated
-
-
-def log_info(current_user, message):
-    logger.info(f'{current_user.username} : {message}')
 
 
 @app.route('/login', methods=['GET'])
 def login():
+    logger.info('Attempting to log in')
     auth = request.authorization
     if not auth or not auth.username or not auth.password:
+        logger.info('FAIL : Cannot verify user')
         return make_response('Sisselogimine ei õnnestunud')
     user = User.query.filter_by(username=auth.username).first()
     if not user:
+        logger.info('FAIL : Username {auth.username} not found')
         return make_response('Sisselogimine ei õnnestunud')
     if check_password_hash(user.password, auth.password):
         token = jwt.encode({'id': user.id, 'exp': datetime.utcnow() + timedelta(minutes=30)},
                            current_app.config['SECRET_KEY'])
+        logger.info('SUCCESS')
         return jsonify({'token': token.decode('UTF-8')})
+    logger.info('FAIL : Password incorrect for user {user.username}')
     return make_response('Sisselogimine ei õnnestunud')
 
 
