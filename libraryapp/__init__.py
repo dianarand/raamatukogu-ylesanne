@@ -8,6 +8,10 @@ app.config.from_object(Config)
 
 db = SQLAlchemy(app)
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    filename='app.log',
+    level=logging.INFO,
+    format='%(asctime)s : %(levelname)s : %(message)s'
+)
 
 from libraryapp import routes
