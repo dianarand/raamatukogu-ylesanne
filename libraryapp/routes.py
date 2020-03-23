@@ -21,7 +21,6 @@ def token_required(f):
         except:
             return jsonify({'message': 'Token ei kehti!'})
         return f(current_user, *args, **kwargs)
-
     return decorated
 
 
@@ -42,6 +41,7 @@ def login():
 
 @app.route('/book', methods=['GET'])
 def get_available_books():
+    app.logger.info('Getting available books')
     available_books = Book.query.filter_by(lender_id=None).all()
     no_duplicates = []
     for curr_book in available_books:
@@ -58,13 +58,16 @@ def get_available_books():
             'location': curr_book.locations()
         }
         output.append(book_data)
+    app.logger.info('SUCCESS')
     return jsonify({'available_books': output})
 
 
 @app.route('/overtime', methods=['GET'])
 @token_required
 def get_overtime_lenders(current_user):
+    app.logger.info('Getting overtime lenders')
     if not current_user.employee:
+        app.logger.info('FAIL : Unauthorized')
         return jsonify({'message': 'Puuduvad töötaja õigused'})
     lended_books = Book.query.filter(Book.deadline != None)
     overtime_books = []
@@ -79,28 +82,35 @@ def get_overtime_lenders(current_user):
             'overtime': curr_book.overtime()
         }
         output.append(book_data)
+    app.logger.info('SUCCESS')
     return jsonify({'overtime_books': output})
 
 
 @app.route('/book', methods=['POST'])
 @token_required
 def create_book(current_user):
+    app.logger.info('Creating new book')
     if not current_user.admin:
+        app.logger.info('FAIL : Unauthorized')
         return jsonify({'message': 'Puuduvad administraatori õigused'})
     data = request.get_json()
     new_book = Book(title=data['title'], author=data['author'], location=data['location'])
     db.session.add(new_book)
     db.session.commit()
+    app.logger.info('SUCCESS')
     return jsonify({'message': 'Raamat lisatud!'})
 
 
 @app.route('/book/<int:book_id>', methods=['GET'])
 @token_required
 def get_book(current_user, book_id):
+    app.logger.info('Getting book information')
     if not current_user.employee:
+        app.logger.info('FAIL : Unauthorized')
         return jsonify({'message': 'Puuduvad töötaja õigused'})
     curr_book = Book.query.get(book_id)
     if not curr_book:
+        app.logger.info('FAIL : Not found')
         return jsonify({'message': 'Pole sellist raamatut!'})
     book_data = {
         'title': curr_book.title,
@@ -109,57 +119,74 @@ def get_book(current_user, book_id):
         'time_limit': curr_book.time_limit(),
         'location': curr_book.location
     }
+    app.logger.info('SUCCESS')
     return jsonify({'book': book_data})
 
 
 @app.route('/book/<int:book_id>', methods=['POST'])
 @token_required
 def checkin_book(current_user, book_id):
+    app.logger.info('Checking book in')
     if not current_user.employee:
+        app.logger.info('FAIL : Unauthorized')
         return jsonify({'message': 'Puuduvad töötaja õigused'})
     curr_book = Book.query.get(book_id)
     if not curr_book:
+        app.logger.info('FAIL : Book not found')
         return jsonify({'message': 'Pole sellist raamatut!'})
     if not curr_book.lender_id:
+        app.logger.info('FAIL : Book not checked out')
         return jsonify({'message': 'Raamat pole väljalaenutatud!'})
     curr_book.checkin()
     db.session.commit()
+    app.logger.info('SUCCESS')
     return jsonify({'message': 'Raamat on tagastatud!'})
 
 
 @app.route('/book/<int:book_id>', methods=['DELETE'])
 @token_required
 def delete_book(current_user, book_id):
+    app.logger.info('Deleting book')
     if not current_user.admin:
+        app.logger.info('FAIL : Unauthorized')
         return jsonify({'message': 'Puuduvad administraatori õigused'})
     curr_book = Book.query.get(book_id)
     if not curr_book:
+        app.logger.info('FAIL : Book not found')
         return jsonify({'message': 'Pole sellist raamatut!'})
     db.session.delete(curr_book)
     db.session.commit()
+    app.logger.info('SUCCESS')
     return jsonify({'message': 'Raamat on kustutatud!'})
 
 
 @app.route('/book/<int:book_id>/<int:lender_id>', methods=['POST'])
 @token_required
 def checkout_book(current_user, book_id, lender_id):
+    app.logger.info('Checking book out')
     if not current_user.employee:
+        app.logger.info('FAIL : Unauthorized')
         return jsonify({'message': 'Puuduvad töötaja õigused'})
     curr_book = Book.query.get(book_id)
     if not curr_book:
+        app.logger.info('FAIL : Book not found')
         return jsonify({'message': 'Pole sellist raamatut!'})
     curr_lender = Lender.query.get(lender_id)
     if not curr_lender:
+        app.logger.info('FAIL : Lender not found')
         return jsonify({'message': 'Pole sellist laenutajat!'})
     curr_book.checkout(lender_id)
     db.session.commit()
+    app.logger.info('SUCCESS')
     return jsonify({'message': 'Raamat on välja laenutatud!'})
 
 
 @app.route('/book/search', methods=['POST'])
 @token_required
 def book_search(current_user):
+    app.logger.info('Searching for books')
     if not current_user.employee:
+        app.logger.info('FAIL : Unauthorized')
         return jsonify({'message': 'Puuduvad töötaja õigused'})
     data = request.get_json()
     if 'title' in data and 'author' in data:
@@ -169,6 +196,7 @@ def book_search(current_user):
     elif 'author' in data:
         book_list = Book.query.filter_by(author=data['author']).all()
     else:
+        app.logger.info('FAIL : Bad request')
         return jsonify({'message': 'Sisesta otsingu info!'})
     output = []
     for curr_book in book_list:
@@ -179,6 +207,7 @@ def book_search(current_user):
             'location': curr_book.location
         }
         output.append(book_data)
+    app.logger.info('SUCCESS')
     return jsonify({'books': output})
 
 
@@ -186,11 +215,13 @@ def book_search(current_user):
 @token_required
 def create_lender(current_user):
     if not current_user.employee:
+        app.logger.info('FAIL : Unauthorized')
         return jsonify({'message': 'Puuduvad töötaja õigused'})
     data = request.get_json()
     new_lender = Lender(name=data['name'], surname=data['surname'], personal_code=data['personal_code'])
     db.session.add(new_lender)
     db.session.commit()
+    app.logger.info('SUCCESS')
     return jsonify({'message': 'Laenutaja lisatud!'})
 
 
@@ -198,9 +229,11 @@ def create_lender(current_user):
 @token_required
 def get_lender(current_user, lender_id):
     if not current_user.employee:
+        app.logger.info('FAIL : Unauthorized')
         return jsonify({'message': 'Puuduvad töötaja õigused'})
     curr_lender = Lender.query.get(lender_id)
     if not curr_lender:
+        app.logger.info('FAIL : Lender not found')
         return jsonify({'message': 'Pole sellist laenutajat!'})
     lender_data = {
         'name': curr_lender.name,
@@ -208,6 +241,7 @@ def get_lender(current_user, lender_id):
         'personal_code': curr_lender.personal_code,
         'lended_books': [book.title for book in curr_lender.books]
     }
+    app.logger.info('SUCCESS')
     return jsonify({'lender': lender_data})
 
 
@@ -215,6 +249,7 @@ def get_lender(current_user, lender_id):
 @token_required
 def lender_search(current_user):
     if not current_user.employee:
+        app.logger.info('FAIL : Unauthorized')
         return jsonify({'message': 'Puuduvad töötaja õigused'})
     data = request.get_json()
     if 'surname' and 'personal_code' in data:
@@ -224,6 +259,7 @@ def lender_search(current_user):
     elif 'personal_code' in data:
         lender_list = Lender.query.filter_by(personal_code=data['personal_code']).all()
     else:
+        app.logger.info('FAIL : Bad request')
         return jsonify({'message': 'Sisesta otsingu info!'})
     output = []
     for curr_lender in lender_list:
@@ -234,4 +270,5 @@ def lender_search(current_user):
             'lended_books': [book.title for book in curr_lender.books]
         }
         output.append(lender_data)
+    app.logger.info('SUCCESS')
     return jsonify({'lender': output})
