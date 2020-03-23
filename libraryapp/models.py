@@ -15,11 +15,9 @@ class Book(db.Model):
         return f'{self.title} ({self.author})'
 
     def availability(self):
-        app.logger.info('Counting available books')
         return len(Book.query.filter_by(title=self.title, author=self.author, lender_id=None).all())
 
     def locations(self):
-        app.logger.info('Finding book locations')
         books = Book.query.filter_by(title=self.title, author=self.author, lender_id=None).all()
         locations = []
         for book in books:
@@ -29,7 +27,6 @@ class Book(db.Model):
         return locations
 
     def time_limit(self):
-        app.logger.info('Finding lending time limit')
         if (date.today() - self.date_added).days / 30 < 3:
             return 1
         if self.availability() < 5:
@@ -38,7 +35,6 @@ class Book(db.Model):
             return 4
 
     def overtime(self):
-        app.logger.info('Calculating overtime')
         days = (date.today() - self.deadline).days
         if days > 0:
             return days
@@ -46,12 +42,10 @@ class Book(db.Model):
             return None
 
     def checkout(self, lender_id):
-        app.logger.info('Assigning lender to book')
         self.deadline = date.today() + timedelta(weeks=self.time_limit())
         self.lender_id = lender_id
 
     def checkin(self):
-        app.logger.info('Removing lender from book')
         self.lender_id = None
         self.deadline = None
 

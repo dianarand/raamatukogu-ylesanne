@@ -1,10 +1,21 @@
 import jwt
+import logging
 from libraryapp import db, app
 from libraryapp.models import User, Book, Lender
 from flask import make_response, current_app, request, jsonify
 from datetime import date, datetime, timedelta
 from werkzeug.security import check_password_hash
 from functools import wraps
+
+logger = logging.getLogger(__name__)
+
+formatter = logging.Formatter('%(asctime)s : %(levelname)s : %(message)s')
+
+file_handler = logging.FileHandler('app.log')
+file_handler.setFormatter(formatter)
+
+logger.setLevel(logging.INFO)
+logger.addHandler(file_handler)
 
 
 def token_required(f):
@@ -21,11 +32,12 @@ def token_required(f):
         except:
             return jsonify({'message': 'Token ei kehti!'})
         return f(current_user, *args, **kwargs)
+
     return decorated
 
 
 def log_info(current_user, message):
-    app.logger.info(f'{current_user.username} : {message}')
+    logger.info(f'{current_user.username} : {message}')
 
 
 @app.route('/login', methods=['GET'])
@@ -45,7 +57,7 @@ def login():
 
 @app.route('/book', methods=['GET'])
 def get_available_books():
-    app.logger.info('Getting available books')
+    logger.info('Getting available books')
     available_books = Book.query.filter_by(lender_id=None).all()
     no_duplicates = []
     for curr_book in available_books:
@@ -62,7 +74,7 @@ def get_available_books():
             'location': curr_book.locations()
         }
         output.append(book_data)
-    app.logger.info('SUCCESS')
+    logger.info('SUCCESS')
     return jsonify({'available_books': output})
 
 
