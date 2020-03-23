@@ -14,12 +14,12 @@ def token_required(f):
         if 'x-access-token' in request.headers:
             token = request.headers['x-access-token']
         if not token:
-            return jsonify({'message': 'mingi teade'})
+            return jsonify({'message': 'Puudub token!'})
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'])
             current_user = User.query.get(data['id'])
         except:
-            return jsonify({'message': 'teade'})
+            return jsonify({'message': 'Token ei kehti!'})
         return f(current_user, *args, **kwargs)
 
     return decorated
@@ -64,6 +64,8 @@ def get_available_books():
 @app.route('/overtime', methods=['GET'])
 @token_required
 def get_overtime_lenders(current_user):
+    if not current_user.employee:
+        return jsonify({'message': 'Puuduvad töötaja õigused'})
     lended_books = Book.query.filter(Book.deadline != None)
     overtime_books = []
     for curr_book in lended_books:
@@ -95,6 +97,8 @@ def create_book(current_user):
 @app.route('/book/<int:book_id>', methods=['GET'])
 @token_required
 def get_book(current_user, book_id):
+    if not current_user.employee:
+        return jsonify({'message': 'Puuduvad töötaja õigused'})
     curr_book = Book.query.get(book_id)
     if not curr_book:
         return jsonify({'message': 'Pole sellist raamatut!'})
@@ -111,6 +115,8 @@ def get_book(current_user, book_id):
 @app.route('/book/<int:book_id>', methods=['POST'])
 @token_required
 def checkin_book(current_user, book_id):
+    if not current_user.employee:
+        return jsonify({'message': 'Puuduvad töötaja õigused'})
     curr_book = Book.query.get(book_id)
     if not curr_book:
         return jsonify({'message': 'Pole sellist raamatut!'})
@@ -137,6 +143,8 @@ def delete_book(current_user, book_id):
 @app.route('/book/<int:book_id>/<int:lender_id>', methods=['POST'])
 @token_required
 def checkout_book(current_user, book_id, lender_id):
+    if not current_user.employee:
+        return jsonify({'message': 'Puuduvad töötaja õigused'})
     curr_book = Book.query.get(book_id)
     if not curr_book:
         return jsonify({'message': 'Pole sellist raamatut!'})
@@ -151,6 +159,8 @@ def checkout_book(current_user, book_id, lender_id):
 @app.route('/book/search', methods=['POST'])
 @token_required
 def book_search(current_user):
+    if not current_user.employee:
+        return jsonify({'message': 'Puuduvad töötaja õigused'})
     data = request.get_json()
     if 'title' in data and 'author' in data:
         book_list = Book.query.filter_by(title=data['title'], author=data['author']).all()
@@ -175,6 +185,8 @@ def book_search(current_user):
 @app.route('/lender', methods=['POST'])
 @token_required
 def create_lender(current_user):
+    if not current_user.employee:
+        return jsonify({'message': 'Puuduvad töötaja õigused'})
     data = request.get_json()
     new_lender = Lender(name=data['name'], surname=data['surname'], personal_code=data['personal_code'])
     db.session.add(new_lender)
@@ -185,6 +197,8 @@ def create_lender(current_user):
 @app.route('/lender/<int:lender_id>', methods=['GET'])
 @token_required
 def get_lender(current_user, lender_id):
+    if not current_user.employee:
+        return jsonify({'message': 'Puuduvad töötaja õigused'})
     curr_lender = Lender.query.get(lender_id)
     if not curr_lender:
         return jsonify({'message': 'Pole sellist laenutajat!'})
@@ -200,6 +214,8 @@ def get_lender(current_user, lender_id):
 @app.route('/lender/search', methods=['POST'])
 @token_required
 def lender_search(current_user):
+    if not current_user.employee:
+        return jsonify({'message': 'Puuduvad töötaja õigused'})
     data = request.get_json()
     if 'surname' and 'personal_code' in data:
         lender_list = Lender.query.filter_by(surname=data['surname'], personal_code=data['personal_code']).all()
