@@ -4,6 +4,25 @@ from libraryapp.models import User, Book, Lender
 from flask import make_response, current_app, request, jsonify
 from datetime import date, datetime, timedelta
 from werkzeug.security import check_password_hash
+from functools import wraps
+
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        if 'x-access-token' in request.headers:
+            token = request.headers['x-access-token']
+        if not token:
+            return jsonify({'message': 'mingi teade'})
+        try:
+            data = jwt.decode(token, app.config['SECRET_KEY'])
+            current_user = User.query.get(data['id'])
+        except:
+            return jsonify({'message': 'teade'})
+        return f(current_user, *args, **kwargs)
+
+    return decorated
 
 
 @app.route('/login', methods=['GET'])
@@ -20,23 +39,6 @@ def login():
         return jsonify({'token': token.decode('UTF-8')})
     return make_response('Sisselogimine ei õnnestunud')
 
-
-@app.route('/overtime', methods=['GET'])
-def get_overtime_lenders():
-    lended_books = Book.query.filter(Book.deadline != None)
-    overtime_books = []
-    for curr_book in lended_books:
-        if curr_book.deadline < date.today():
-            overtime_books.append(curr_book)
-    output = []
-    for curr_book in overtime_books:
-        data = {
-            'lender': curr_book.lender.name + ' ' + curr_book.lender.surname,
-            'title': curr_book.title,
-            'overtime': curr_book.overtime()
-        }
-        output.append(data)
-    return jsonify({'overtime': output})
 
 @app.route('/book', methods=['GET'])
 def get_available_books():
@@ -59,8 +61,30 @@ def get_available_books():
     return jsonify({'available_books': output})
 
 
+@app.route('/overtime', methods=['GET'])
+@token_required
+def get_overtime_lenders(current_user):
+    lended_books = Book.query.filter(Book.deadline != None)
+    overtime_books = []
+    for curr_book in lended_books:
+        if curr_book.deadline < date.today():
+            overtime_books.append(curr_book)
+    output = []
+    for curr_book in overtime_books:
+        data = {
+            'lender': curr_book.lender.name + ' ' + curr_book.lender.surname,
+            'title': curr_book.title,
+            'overtime': curr_book.overtime()
+        }
+        output.append(data)
+    return jsonify({'overtime': output})
+
+
 @app.route('/book', methods=['POST'])
-def create_book():
+@token_required
+def create_book(current_user):
+    if not current_user.admin:
+        return jsonify({'message': 'Puuduvad administraatori õigused'})
     data = request.get_json()
     new_book = Book(title=data['title'], author=data['author'], location=data['location'])
     db.session.add(new_book)
@@ -69,7 +93,8 @@ def create_book():
 
 
 @app.route('/book/<int:book_id>', methods=['GET'])
-def get_book(book_id):
+@token_required
+def get_book(current_user, book_id):
     curr_book = Book.query.get(book_id)
     if not curr_book:
         return jsonify({'message': 'Pole sellist raamatut!'})
@@ -84,7 +109,10 @@ def get_book(book_id):
 
 
 @app.route('/book/<int:book_id>', methods=['DELETE'])
-def delete_book(book_id):
+@token_required
+def delete_book(current_user, book_id):
+    if not current_user.admin:
+        return jsonify({'message': 'Puuduvad administraatori õigused'})
     curr_book = Book.query.get(book_id)
     if not curr_book:
         return jsonify({'message': 'Pole sellist raamatut!'})
@@ -92,8 +120,10 @@ def delete_book(book_id):
     db.session.commit()
     return jsonify({'message': 'Raamat on kustutatud!'})
 
+
 @app.route('/lender', methods=['POST'])
-def create_lender():
+@token_required
+def create_lender(current_user):
     data = request.get_json()
     new_lender = Lender(name=data['name'], surname=data['surname'], personal_code=data['personal_code'])
     db.session.add(new_lender)
@@ -102,7 +132,8 @@ def create_lender():
 
 
 @app.route('/lender/<int:lender_id>', methods=['GET'])
-def get_lender(lender_id):
+@token_required
+def get_lender(current_user, lender_id):
     curr_lender = Lender.query.get(lender_id)
     if not curr_lender:
         return jsonify({'message': 'Pole sellist laenutajat!'})
@@ -113,4 +144,3 @@ def get_lender(lender_id):
         'lended_books': [book.title for book in curr_lender.books]
     }
     return jsonify({'lender': data})
-

@@ -8,21 +8,6 @@ from werkzeug.security import check_password_hash
 from functools import wraps
 
 
-def token_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        token = None
-        if 'x-access-token' in request.headers:
-            token = request.headers['x-access-token']
-        if not token:
-            return jsonify({'message': 'Puudub token!'})
-        try:
-            data = jwt.decode(token, app.config['SECRET_KEY'])
-            current_user = User.query.get(data['id'])
-        except:
-            return jsonify({'message': 'teade'})
-        return f(current_user, *args, **kwargs)
-    return decorated
 
 
 
