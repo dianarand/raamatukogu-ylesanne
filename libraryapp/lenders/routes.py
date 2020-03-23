@@ -1,5 +1,5 @@
 from datetime import date
-from flask import Blueprint, redirect, url_for, render_template, flash, jsonify
+from flask import Blueprint, redirect, url_for, render_template, flash, request, jsonify
 from flask_login import login_required
 from libraryapp import db
 from libraryapp.models import Lender
@@ -11,7 +11,7 @@ lenders = Blueprint('lenders', __name__)
 @lenders.route('/lender', methods=['POST'])
 def create_lender():
     data = request.get_json()
-    new_lender = Lender(name=data['name'], surname=data['surname'], personal_code=['personal_code'])
+    new_lender = Lender(name=data['name'], surname=data['surname'], personal_code=data['personal_code'])
     db.session.add(new_lender)
     db.session.commit()
     return jsonify({'message': 'Laenutaja lisatud!'})

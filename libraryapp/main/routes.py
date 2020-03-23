@@ -1,5 +1,5 @@
 from datetime import date, datetime, timedelta
-from flask import Blueprint, redirect, url_for, render_template, request, flash, make_response, jsonify
+from flask import Blueprint, redirect, url_for, render_template, request, flash, make_response, jsonify, current_app
 from flask_login import login_user, current_user, logout_user, login_required
 from libraryapp.models import Book, User
 from libraryapp.main.forms import LoginForm
@@ -13,10 +13,10 @@ def login():
     auth = request.authorization
     if not auth or not auth.username:
         return make_response('Could not verify', 401)
-    user = User.query.filter_by(name=auth.username).first()
+    user = User.query.filter_by(username=auth.username).first()
     if not user:
         return make_response('Could not verify', 401)
-    token = jwt.encode({'exp': datetime.utcnow() + timedelta(minutes=30)}, app.config['SECRET_KEY'])
+    token = jwt.encode({'exp': datetime.utcnow() + timedelta(minutes=30)}, current_app.config['SECRET_KEY'])
     return jsonify({'token': token.decode('UTF-8')})
 
 

@@ -31,7 +31,7 @@ def get_available_books():
 @books.route('/book', methods=['POST'])
 def create_book():
     data = request.get_json()
-    new_book = Book(title=data['title'], author=data['author'], location=['location'])
+    new_book = Book(title=data['title'], author=data['author'], location=data['location'])
     db.session.add(new_book)
     db.session.commit()
     return jsonify({'message': 'Raamat lisatud!'})
