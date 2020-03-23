@@ -108,6 +108,19 @@ def get_book(current_user, book_id):
     return jsonify({'book': data})
 
 
+@app.route('/book/<int:book_id>', methods=['POST'])
+@token_required
+def checkin_book(current_user, book_id):
+    curr_book = Book.query.get(book_id)
+    if not curr_book:
+        return jsonify({'message': 'Pole sellist raamatut!'})
+    if not curr_book.lender_id:
+        return jsonify({'message': 'Raamat pole väljalaenutatud!'})
+    curr_book.checkin()
+    db.session.commit()
+    return jsonify({'message': 'Raamat on tagastatud!'})
+
+
 @app.route('/book/<int:book_id>', methods=['DELETE'])
 @token_required
 def delete_book(current_user, book_id):
@@ -119,6 +132,20 @@ def delete_book(current_user, book_id):
     db.session.delete(curr_book)
     db.session.commit()
     return jsonify({'message': 'Raamat on kustutatud!'})
+
+
+@app.route('/book/<int:book_id>/<int:lender_id>', methods=['POST'])
+@token_required
+def checkout_book(current_user, book_id, lender_id):
+    curr_book = Book.query.get(book_id)
+    if not curr_book:
+        return jsonify({'message': 'Pole sellist raamatut!'})
+    curr_lender = Lender.query.get(lender_id)
+    if not curr_lender:
+        return jsonify({'message': 'Pole sellist laenutajat!'})
+    curr_book.checkout(lender_id)
+    db.session.commit()
+    return jsonify({'message': 'Raamat on välja laenutatud!'})
 
 
 @app.route('/lender', methods=['POST'])

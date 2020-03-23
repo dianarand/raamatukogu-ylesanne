@@ -22,34 +22,3 @@ from libraryapp.books.forms import AddForm, LendForm, SearchForm, ConfirmButton
 #         return render_template('book_result.html', result=result)
 #     return render_template('search.html', title='Raamatu otsing', form=form)
 #
-#
-# @books.route('/book/<int:book_id>/lend', methods=['GET', 'POST'])
-# @login_required
-# def lend_book(book_id):
-#     book = Book.query.get_or_404(book_id)
-#     form = LendForm()
-#     # form.time_limit.data = book.time_limit()
-#     if form.validate_on_submit():
-#         lender = Lender.query.filter_by(personal_code=form.code.data).first()
-#         if lender:
-#             book.checkout(lender_id=lender.id)
-#             db.session.commit()
-#             flash(f'Raamat on laenutatud kasutajale {lender}')
-#             return redirect(url_for('main.home'))
-#         else:
-#             flash('Laenutajat ei ole olemas! Proovi uuesti.')
-#     return render_template('add_lender.html', title='Raamatu laenutamine', book=book, form=form)
-#
-#
-# @books.route('/book/<int:book_id>/return', methods=['GET', 'POST'])
-# @login_required
-# def return_book(book_id):
-#     book = Book.query.get_or_404(book_id)
-#     lender = Lender.query.get(book.lender_id)
-#     form = ConfirmButton()
-#     if form.validate_on_submit():
-#         book.checkin()
-#         db.session.commit()
-#         flash(f'Raamat "{book.title}" on tagastatud kasutajalt {lender}')
-#         return redirect(url_for('main.home'))
-#     return render_template('add_lender.html', title='Raamatu tagastamine', book=book, lender=lender, form=form)
