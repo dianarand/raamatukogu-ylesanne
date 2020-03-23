@@ -5,40 +5,26 @@ from libraryapp.models import Book, User
 from libraryapp.main.forms import LoginForm
 import jwt
 from werkzeug.security import check_password_hash
-
-main = Blueprint('main', __name__)
-
-
-@main.route('/login')
-def login():
-    auth = request.authorization
-    if not auth or not auth.username or not auth.password:
-        return make_response('Sisselogimine ei õnnestunud')
-    user = User.query.filter_by(username=auth.username).first()
-    if not user:
-        return make_response('Sisselogimine ei õnnestunud')
-    if check_password_hash(user.password, auth.password):
-        token = jwt.encode({'exp': datetime.utcnow() + timedelta(minutes=30)}, current_app.config['SECRET_KEY'])
-        return jsonify({'token': token.decode('UTF-8')})
-    return make_response('Sisselogimine ei õnnestunud')
+from functools import wraps
 
 
-@main.route('/overtime', methods=['GET'])
-def get_overtime_lenders():
-    lended_books = Book.query.filter(Book.deadline != None)
-    overtime_books = []
-    for curr_book in lended_books:
-        if curr_book.deadline < date.today():
-            overtime_books.append(curr_book)
-    output = []
-    for curr_book in overtime_books:
-        data = {
-            'lender': curr_book.lender.name + ' ' + curr_book.lender.surname,
-            'title': curr_book.title,
-            'overtime': curr_book.overtime()
-        }
-        output.append(data)
-    return jsonify({'overtime': output})
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        if 'x-access-token' in request.headers:
+            token = request.headers['x-access-token']
+        if not token:
+            return jsonify({'message': 'Puudub token!'})
+        try:
+            data = jwt.decode(token, app.config['SECRET_KEY'])
+            current_user = User.query.get(data['id'])
+        except:
+            return jsonify({'message': 'teade'})
+        return f(current_user, *args, **kwargs)
+    return decorated
+
+
 
 # @main.route('/')
 # def home():

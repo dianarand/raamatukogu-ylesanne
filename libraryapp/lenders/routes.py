@@ -5,30 +5,6 @@ from libraryapp import db
 from libraryapp.models import Lender
 from libraryapp.lenders.forms import AddForm, SearchForm
 
-lenders = Blueprint('lenders', __name__)
-
-
-@lenders.route('/lender', methods=['POST'])
-def create_lender():
-    data = request.get_json()
-    new_lender = Lender(name=data['name'], surname=data['surname'], personal_code=data['personal_code'])
-    db.session.add(new_lender)
-    db.session.commit()
-    return jsonify({'message': 'Laenutaja lisatud!'})
-
-
-@lenders.route('/lender/<int:lender_id>', methods=['GET'])
-def get_lender(lender_id):
-    curr_lender = Lender.query.get(lender_id)
-    if not curr_lender:
-        return jsonify({'message': 'Pole sellist laenutajat!'})
-    data = {
-        'name': curr_lender.name,
-        'surname': curr_lender.surname,
-        'personal_code': curr_lender.personal_code,
-        'lended_books': [book.title for book in curr_lender.books]
-    }
-    return jsonify({'lender': data})
 
 # @lenders.route('/lender/search', methods=['GET', 'POST'])
 # @login_required

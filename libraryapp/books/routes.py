@@ -4,63 +4,6 @@ from libraryapp import db
 from libraryapp.models import Book, Lender
 from libraryapp.books.forms import AddForm, LendForm, SearchForm, ConfirmButton
 
-books = Blueprint('books', __name__)
-
-
-@books.route('/book', methods=['GET'])
-def get_available_books():
-    available_books = Book.query.filter_by(lender_id=None).all()
-    no_duplicates = []
-    for curr_book in available_books:
-        tba = Book.query.filter_by(title=curr_book.title, author=curr_book.author, lender_id=None).first()
-        if tba not in no_duplicates:
-            no_duplicates.append(tba)
-    output = []
-    for curr_book in no_duplicates:
-        book_data = {
-            'title': curr_book.title,
-            'author': curr_book.author,
-            'availability': curr_book.availability(),
-            'time_limit': curr_book.time_limit(),
-            'location': curr_book.locations()
-        }
-        output.append(book_data)
-    return jsonify({'available_books': output})
-
-
-@books.route('/book', methods=['POST'])
-def create_book():
-    data = request.get_json()
-    new_book = Book(title=data['title'], author=data['author'], location=data['location'])
-    db.session.add(new_book)
-    db.session.commit()
-    return jsonify({'message': 'Raamat lisatud!'})
-
-
-@books.route('/book/<int:book_id>', methods=['GET'])
-def get_book(book_id):
-    curr_book = Book.query.get(book_id)
-    if not curr_book:
-        return jsonify({'message': 'Pole sellist raamatut!'})
-    data = {
-        'title': curr_book.title,
-        'author': curr_book.author,
-        'availability': curr_book.availability(),
-        'time_limit': curr_book.time_limit(),
-        'location': curr_book.location
-    }
-    return jsonify({'book': data})
-
-
-@books.route('/book/<int:book_id>', methods=['DELETE'])
-def delete_book(book_id):
-    curr_book = Book.query.get(book_id)
-    if not curr_book:
-        return jsonify({'message': 'Pole sellist raamatut!'})
-    db.session.delete(curr_book)
-    db.session.commit()
-    return jsonify({'message': 'Raamat on kustutatud!'})
-
 
 # @books.route('/book/search', methods=['GET', 'POST'])
 # @login_required
