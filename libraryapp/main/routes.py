@@ -4,6 +4,7 @@ from flask_login import login_user, current_user, logout_user, login_required
 from libraryapp.models import Book, User
 from libraryapp.main.forms import LoginForm
 import jwt
+from werkzeug.security import check_password_hash
 
 main = Blueprint('main', __name__)
 
@@ -11,13 +12,15 @@ main = Blueprint('main', __name__)
 @main.route('/login')
 def login():
     auth = request.authorization
-    if not auth or not auth.username:
-        return make_response('Could not verify', 401)
+    if not auth or not auth.username or not auth.password:
+        return make_response('Sisselogimine ei õnnestunud')
     user = User.query.filter_by(username=auth.username).first()
     if not user:
-        return make_response('Could not verify', 401)
-    token = jwt.encode({'exp': datetime.utcnow() + timedelta(minutes=30)}, current_app.config['SECRET_KEY'])
-    return jsonify({'token': token.decode('UTF-8')})
+        return make_response('Sisselogimine ei õnnestunud')
+    if check_password_hash(user.password, auth.password):
+        token = jwt.encode({'exp': datetime.utcnow() + timedelta(minutes=30)}, current_app.config['SECRET_KEY'])
+        return jsonify({'token': token.decode('UTF-8')})
+    return make_response('Sisselogimine ei õnnestunud')
 
 
 @main.route('/overtime', methods=['GET'])
