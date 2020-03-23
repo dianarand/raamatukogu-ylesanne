@@ -3,22 +3,40 @@ from wtforms import StringField, SubmitField, IntegerField
 from wtforms.validators import DataRequired, Length, NumberRange
 
 
-class AddForm(FlaskForm):
+class LoginForm(FlaskForm):
+    username = StringField('Kasutaja', validators=[DataRequired()])
+    submit = SubmitField('Sisene')
+
+
+class BookForm(FlaskForm):
     title = StringField('Pealkiri', validators=[DataRequired(), Length(max=100)])
     author = StringField('Autor', validators=[DataRequired(), Length(max=100)])
     location = IntegerField('Riiuli number', validators=[DataRequired(), NumberRange(min=1)])
     submit = SubmitField('Lisa')
 
 
-class LendForm(FlaskForm):
+class LenderForm(FlaskForm):
+    name = StringField('Eesnimi', validators=[DataRequired(), Length(max=50)])
+    surname = StringField('Perekonnanimi', validators=[DataRequired(), Length(max=50)])
+    code = StringField('Isikukood', validators=[DataRequired(), Length(min=11, max=11)])
+    submit = SubmitField('Lisa')
+
+
+class BookLendForm(FlaskForm):
     # time_limit = IntegerField('Laenutuse pikkus')
     code = StringField('Isikukood', validators=[DataRequired(), Length(min=11, max=11)])
     submit = SubmitField('Laenuta')
 
 
-class SearchForm(FlaskForm):
+class BookSearchForm(FlaskForm):
     title = StringField('Pealkiri', validators=[Length(max=100)])
     author = StringField('Autor', validators=[Length(max=100)])
+    submit = SubmitField('Otsi')
+
+
+class LenderSearchForm(FlaskForm):
+    surname = StringField('Perekonnanimi', validators=[Length(max=50)])
+    code = StringField('Isikukood', validators=[Length(max=11)])
     submit = SubmitField('Otsi')
 
 
