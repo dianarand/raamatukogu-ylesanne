@@ -19,10 +19,12 @@ logger.addHandler(file_handler)
 
 
 def log_info(current_user, message):
+    """Logs message into log file with username"""
     logger.info(f'{current_user.username} : {message}')
 
 
 def token_required(f):
+    """Checks user for valid token"""
     @wraps(f)
     def decorated(*args, **kwargs):
         token = None
@@ -43,6 +45,7 @@ def token_required(f):
 
 @app.route('/login', methods=['GET'])
 def login():
+    """Login route"""
     logger.info('Attempting to log in')
     auth = request.authorization
     if not auth or not auth.username or not auth.password:
@@ -63,6 +66,7 @@ def login():
 
 @app.route('/book', methods=['GET'])
 def get_available_books():
+    """Returns dictionary of currently available books"""
     logger.info('Getting available books')
     available_books = Book.query.filter_by(lender_id=None).all()
     no_duplicates = []
@@ -91,6 +95,7 @@ def get_available_books():
 @app.route('/overtime', methods=['GET'])
 @token_required
 def get_overtime_lenders(current_user):
+    """Returns dictionary of lenders with overtime books"""
     log_info(current_user, 'Getting overtime lenders')
     if not current_user.employee:
         log_info(current_user, 'FAIL : Unauthorized')
@@ -115,6 +120,7 @@ def get_overtime_lenders(current_user):
 @app.route('/book', methods=['POST'])
 @token_required
 def create_book(current_user):
+    """Adds a new book"""
     log_info(current_user, 'Creating new book')
     if not current_user.admin:
         log_info(current_user, 'FAIL : Unauthorized')
@@ -130,6 +136,7 @@ def create_book(current_user):
 @app.route('/book/<int:book_id>', methods=['GET'])
 @token_required
 def get_book(current_user, book_id):
+    """Returns dictionary with information about a book with a given ID"""
     log_info(current_user, 'Getting book information')
     if not current_user.employee:
         log_info(current_user, 'FAIL : Unauthorized')
@@ -152,6 +159,7 @@ def get_book(current_user, book_id):
 @app.route('/book/<int:book_id>', methods=['POST'])
 @token_required
 def checkin_book(current_user, book_id):
+    """Checks in book with a given ID, assuming it has been checked out"""
     log_info(current_user, 'Checking book in')
     if not current_user.employee:
         log_info(current_user, 'FAIL : Unauthorized')
@@ -172,6 +180,7 @@ def checkin_book(current_user, book_id):
 @app.route('/book/<int:book_id>', methods=['DELETE'])
 @token_required
 def delete_book(current_user, book_id):
+    """Deletes book with a given ID"""
     log_info(current_user, 'Deleting book')
     if not current_user.admin:
         log_info(current_user, 'FAIL : Unauthorized')
@@ -189,6 +198,7 @@ def delete_book(current_user, book_id):
 @app.route('/book/<int:book_id>/<int:lender_id>', methods=['POST'])
 @token_required
 def checkout_book(current_user, book_id, lender_id):
+    """Checks out book with a given ID to a lender with a given ID"""
     log_info(current_user, 'Checking book out')
     if not current_user.employee:
         log_info(current_user, 'FAIL : Unauthorized')
@@ -210,6 +220,7 @@ def checkout_book(current_user, book_id, lender_id):
 @app.route('/book/search', methods=['POST'])
 @token_required
 def book_search(current_user):
+    """Searches for a book by given title or author or both"""
     log_info(current_user, 'Searching for books')
     if not current_user.employee:
         log_info(current_user, 'FAIL : Unauthorized')
@@ -241,6 +252,7 @@ def book_search(current_user):
 @app.route('/lender', methods=['POST'])
 @token_required
 def create_lender(current_user):
+    """Adds a new lender"""
     log_info(current_user, 'Creating new lender')
     if not current_user.employee:
         log_info(current_user, 'FAIL : Unauthorized')
@@ -260,6 +272,7 @@ def create_lender(current_user):
 @app.route('/lender/<int:lender_id>', methods=['GET'])
 @token_required
 def get_lender(current_user, lender_id):
+    """Returns dictionary with information about a lender with a given ID"""
     log_info(current_user, 'Getting lender information')
     if not current_user.employee:
         log_info(current_user, 'FAIL : Unauthorized')
@@ -281,6 +294,7 @@ def get_lender(current_user, lender_id):
 @app.route('/lender/search', methods=['POST'])
 @token_required
 def lender_search(current_user):
+    """Searches for a lender by given surname or personal code or both"""
     log_info(current_user, 'Searching for lenders')
     if not current_user.employee:
         log_info(current_user, 'FAIL : Unauthorized')
