@@ -278,7 +278,7 @@ def lender_search(current_user):
         log_info(current_user, 'FAIL : Unauthorized')
         abort(403)
     data = request.get_json()
-    if 'surname' and 'personal_code' in data:
+    if 'surname' in data and 'personal_code' in data:
         lender_list = Lender.query.filter_by(surname=data['surname'], personal_code=data['personal_code']).all()
     elif 'surname' in data:
         lender_list = Lender.query.filter_by(surname=data['surname']).all()
