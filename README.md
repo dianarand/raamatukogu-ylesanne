@@ -14,6 +14,7 @@ Nõuded on saadaval failis requirements.txt
 | Võta raamat vastu | /book/:book_id | POST | book_id=[int]
 | Kustuta raamat | /book/:book_id | DELETE | book_id=[int]
 | Laenuta raamat välja | /book/:book_id/:lender_id | POST | book_id=[int], lender_id=[int]
+| Laenuta raamat välja vabalt valitud tähtajaga | /book/:book_id/:lender_id/:weeks | POST | book_id=[int], lender_id=[int], weeks=[int]
 | Otsi raamatut | /book/search | POST | {"title": [string], "author": [string]}
 | Lisa uus laenutaja | /lender | POST | {"name": [string], "surname": [string], "personal_code": [int]}
 | Vaata laenutaja infot | /lender/:lender_id | GET | lender_id=[int]

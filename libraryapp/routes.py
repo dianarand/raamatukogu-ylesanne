@@ -195,9 +195,10 @@ def delete_book(current_user, book_id):
     return jsonify({'message': 'Raamat on kustutatud!'})
 
 
-@app.route('/book/<int:book_id>/<int:lender_id>', methods=['POST'])
+@app.route('/book/<int:book_id>/<int:lender_id>/<int:weeks>', methods=['POST'])
+@app.route('/book/<int:book_id>/<int:lender_id>', methods=['POST'], defaults={'weeks': None})
 @token_required
-def checkout_book(current_user, book_id, lender_id):
+def checkout_book(current_user, book_id, lender_id, weeks):
     """Checks out book with a given ID to a lender with a given ID"""
     log_info(current_user, 'Checking book out')
     if not current_user.employee:
@@ -211,7 +212,7 @@ def checkout_book(current_user, book_id, lender_id):
     if not curr_lender:
         log_info(current_user, 'FAIL : Lender not found')
         abort(404)
-    curr_book.checkout(lender_id)
+    curr_book.checkout(lender_id, weeks)
     db.session.commit()
     log_info(current_user, 'SUCCESS')
     return jsonify({'message': 'Raamat on välja laenutatud!'})

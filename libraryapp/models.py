@@ -43,9 +43,12 @@ class Book(db.Model):
             return days
         return None
 
-    def checkout(self, lender_id):
+    def checkout(self, lender_id, weeks):
         """Checks out book to a lender with given ID"""
-        self.deadline = date.today() + timedelta(weeks=self.time_limit())
+        if weeks:
+            self.deadline = date.today() + timedelta(weeks=weeks)
+        else:
+            self.deadline = date.today() + timedelta(weeks=self.time_limit())
         self.lender_id = lender_id
 
     def checkin(self):
