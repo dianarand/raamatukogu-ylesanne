@@ -1,6 +1,8 @@
 # Raamatukogu
 Raamatukogu teemaline proovitöö
 
+Nõuded on saadaval failis requirements.txt
+
 ## API
 
 | Tegevus | URL | Meetod | Parameetrid |
