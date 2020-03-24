@@ -223,6 +223,7 @@ def book_search(current_user):
     output = []
     for curr_book in book_list:
         book_data = {
+            'book_id': curr_book.id,
             'title': curr_book.title,
             'author': curr_book.author,
             'time_limit': curr_book.time_limit(),
@@ -289,6 +290,7 @@ def lender_search(current_user):
     output = []
     for curr_lender in lender_list:
         lender_data = {
+            'lender_id': curr_lender.id,
             'name': curr_lender.name,
             'surname': curr_lender.surname,
             'personal_code': curr_lender.personal_code,
