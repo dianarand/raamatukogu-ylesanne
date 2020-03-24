@@ -15,9 +15,11 @@ class Book(db.Model):
         return f'{self.title} ({self.author})'
 
     def availability(self):
+        """Returns number of books available with same title and author"""
         return len(Book.query.filter_by(title=self.title, author=self.author, lender_id=None).all())
 
     def locations(self):
+        """Returns all locations for books with same title and author"""
         books = Book.query.filter_by(title=self.title, author=self.author, lender_id=None).all()
         locations = []
         for book in books:
@@ -27,25 +29,30 @@ class Book(db.Model):
         return locations
 
     def time_limit(self):
+        """Returns time limit in weeks for lending given book"""
         if (date.today() - self.date_added).days / 30 < 3:
             return 1
         if self.availability() < 5:
             return 1
-        else:
-            return 4
+        return 4
 
     def overtime(self):
+        """Returns number of overtime days if book has been not returned before deadline"""
         days = (date.today() - self.deadline).days
         if days > 0:
             return days
-        else:
-            return None
+        return None
 
-    def checkout(self, lender_id):
-        self.deadline = date.today() + timedelta(weeks=self.time_limit())
+    def checkout(self, lender_id, weeks):
+        """Checks out book to a lender with given ID"""
+        if weeks:
+            self.deadline = date.today() + timedelta(weeks=weeks)
+        else:
+            self.deadline = date.today() + timedelta(weeks=self.time_limit())
         self.lender_id = lender_id
 
     def checkin(self):
+        """Checks book in to library"""
         self.lender_id = None
         self.deadline = None
 
