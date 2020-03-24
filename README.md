@@ -3,6 +3,20 @@ Raamatukogu teemaline proovitöö
 
 Nõuded on saadaval failis requirements.txt
 
+Installeerimiseks
+```
+pip install -r requirements.txt
+```
+
+Katsetamiseks on olemas näidisandmebaas, kus on saadaval kaks kasutajat:
+* **Teenindaja**, kellel on tavalised raamatukogu töötaja õigused (kasutajanimi: teenindaja; parool: parool)
+* **Administraator**, kellel on õigused kõigiks võimalikeks tegevusteks (kasutajanimi: admin; parool: admin)
+
+Käivitamiseks jooksutada
+```
+python run.py
+```
+
 ## API
 
 | Tegevus | URL | Meetod | Parameetrid |
