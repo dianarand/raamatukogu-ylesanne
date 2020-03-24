@@ -1,3 +1,5 @@
+from typing import Dict, List, Any
+
 import jwt
 import logging
 from functools import wraps
@@ -152,6 +154,13 @@ def get_book(current_user, book_id):
         'time_limit': curr_book.time_limit(),
         'location': curr_book.location
     }
+    if curr_book.lender_id:
+        curr_lender = Lender.query.get(curr_book.lender_id)
+        book_data.update({
+            'lender_id': curr_book.lender_id,
+            'lender': curr_lender.name + ' ' + curr_lender.surname,
+            'deadline': curr_book.deadline
+        })
     log_info(current_user, 'SUCCESS')
     return jsonify({'book': book_data})
 
@@ -245,6 +254,13 @@ def book_search(current_user):
             'time_limit': curr_book.time_limit(),
             'location': curr_book.location
         }
+        if curr_book.lender_id:
+            curr_lender = Lender.query.get(curr_book.lender_id)
+            book_data.update({
+                'lender_id': curr_book.lender_id,
+                'lender': curr_lender.name + ' ' + curr_lender.surname,
+                'deadline': curr_book.deadline
+            })
         output.append(book_data)
     log_info(current_user, 'SUCCESS')
     return jsonify({'books': output})
@@ -282,11 +298,15 @@ def get_lender(current_user, lender_id):
     if not curr_lender:
         log_info(current_user, 'FAIL : Lender not found')
         abort(404)
+    lended_books = {
+        'titles': [book.title for book in curr_lender.books],
+        'deadlines': [book.deadline for book in curr_lender.books]
+    }
     lender_data = {
         'name': curr_lender.name,
         'surname': curr_lender.surname,
         'personal_code': curr_lender.personal_code,
-        'lended_books': [book.title for book in curr_lender.books]
+        'lended_books': lended_books
     }
     log_info(current_user, 'SUCCESS')
     return jsonify({'lender': lender_data})
