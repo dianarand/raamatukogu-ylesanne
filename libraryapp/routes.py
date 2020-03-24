@@ -1,11 +1,11 @@
 import jwt
 import logging
+from functools import wraps
+from datetime import date, datetime, timedelta
+from flask import current_app, request, jsonify, abort
+from werkzeug.security import check_password_hash
 from libraryapp import db, app
 from libraryapp.models import User, Book, Lender
-from flask import current_app, request, jsonify, abort
-from datetime import date, datetime, timedelta
-from werkzeug.security import check_password_hash
-from functools import wraps
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +67,11 @@ def get_available_books():
     available_books = Book.query.filter_by(lender_id=None).all()
     no_duplicates = []
     for curr_book in available_books:
-        tba = Book.query.filter_by(title=curr_book.title, author=curr_book.author, lender_id=None).first()
+        tba = Book.query.filter_by(
+            title=curr_book.title,
+            author=curr_book.author,
+            lender_id=None
+        ).first()
         if tba not in no_duplicates:
             no_duplicates.append(tba)
     output = []
@@ -242,7 +246,11 @@ def create_lender(current_user):
         log_info(current_user, 'FAIL : Unauthorized')
         abort(403)
     data = request.get_json()
-    new_lender = Lender(name=data['name'], surname=data['surname'], personal_code=data['personal_code'])
+    new_lender = Lender(
+        name=data['name'],
+        surname=data['surname'],
+        personal_code=data['personal_code']
+    )
     db.session.add(new_lender)
     db.session.commit()
     log_info(current_user, 'SUCCESS')
@@ -279,7 +287,10 @@ def lender_search(current_user):
         abort(403)
     data = request.get_json()
     if 'surname' in data and 'personal_code' in data:
-        lender_list = Lender.query.filter_by(surname=data['surname'], personal_code=data['personal_code']).all()
+        lender_list = Lender.query.filter_by(
+            surname=data['surname'],
+            personal_code=data['personal_code']
+        ).all()
     elif 'surname' in data:
         lender_list = Lender.query.filter_by(surname=data['surname']).all()
     elif 'personal_code' in data:

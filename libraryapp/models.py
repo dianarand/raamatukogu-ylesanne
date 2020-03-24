@@ -31,15 +31,13 @@ class Book(db.Model):
             return 1
         if self.availability() < 5:
             return 1
-        else:
-            return 4
+        return 4
 
     def overtime(self):
         days = (date.today() - self.deadline).days
         if days > 0:
             return days
-        else:
-            return None
+        return None
 
     def checkout(self, lender_id):
         self.deadline = date.today() + timedelta(weeks=self.time_limit())
